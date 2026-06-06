@@ -1,0 +1,513 @@
+<template>
+    <lightning-card title={lbl.dashboardTitle} icon-name="standard:product">
+        <div slot="actions"><button type="button" class="cpq-lang-toggle" onclick={handleToggleLanguage}><img
+                    src={langIcon} class="cpq-lang-icon" alt="" />{langToggleLabel}</button></div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             STEP 1 — DASHBOARD (no active quote)
+        ══════════════════════════════════════════════════════════ -->
+        <template if:false={quoteId}>
+            <c-cpq-dashboard
+                labels={labelsConfig}
+                current-lang={currentLang}
+                onquoteselect={handleDashboardQuoteSelect}
+                oncreatenew={handleOpenNewQuoteModal}>
+            </c-cpq-dashboard>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════
+             STEP 2 — QUOTE CONFIGURATOR (active quote, no active order)
+        ══════════════════════════════════════════════════════════ -->
+        <template if:true={quoteId}>
+            <template if:false={showOrderView}>
+
+                <!-- HEADER -->
+                <div class="cpq-header">
+                    <div class="cpq-header-left">
+                        <span class="cpq-header-live-dot"></span>
+                        <span class="cpq-header-title">{lbl.configuratorTitle}</span>
+                    </div>
+                    <div class="cpq-header-right">
+                        <template if:true={quoteName}>
+                            <span class="cpq-quote-badge">{quoteName}</span>
+                        </template>
+                        <span class="cpq-currency-badge">{selectedCurrency}</span>
+                        <div class="cpq-user-pill">
+                            <div class="cpq-user-avatar">{userInitials}</div>
+                            <span class="cpq-user-name">{selectedAccount.name}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CPQ FLOW PROGRESS TRACKER -->
+                <div class="cpq-ptrack">
+                    <div class="cpq-ptrack-shimmer"></div>
+                    <div class="cpq-pstep cpq-pstep-done">
+                        <div class="cpq-pstep-pill">
+                            <span class="cpq-pstep-icon">✓</span>
+                            <span class="cpq-pstep-text">
+                                <span class="cpq-pstep-label">{lbl.stepQuoteCreated}</span>
+                                <span class="cpq-pstep-num">01</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="cpq-pconn cpq-pconn-done"></div>
+                    <div class="cpq-pstep cpq-pstep-active">
+                        <div class="cpq-pstep-pill">
+                            <span class="cpq-pstep-icon">2</span>
+                            <span class="cpq-pstep-text">
+                                <span class="cpq-pstep-label">{lbl.stepConfigurePrice}</span>
+                                <span class="cpq-pstep-num">02</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="cpq-pconn"></div>
+                    <div class="cpq-pstep">
+                        <div class="cpq-pstep-pill">
+                            <span class="cpq-pstep-icon">3</span>
+                            <span class="cpq-pstep-text">
+                                <span class="cpq-pstep-label">{lbl.stepMarkOrdered}</span>
+                                <span class="cpq-pstep-num">03</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="cpq-pconn"></div>
+                    <div class="cpq-pstep">
+                        <div class="cpq-pstep-pill">
+                            <span class="cpq-pstep-icon">4</span>
+                            <span class="cpq-pstep-text">
+                                <span class="cpq-pstep-label">{lbl.stepActivateOrder}</span>
+                                <span class="cpq-pstep-num">04</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="cpq-pconn"></div>
+                    <div class="cpq-pstep">
+                        <div class="cpq-pstep-pill">
+                            <span class="cpq-pstep-icon">5</span>
+                            <span class="cpq-pstep-text">
+                                <span class="cpq-pstep-label">{lbl.stepContract}</span>
+                                <span class="cpq-pstep-num">05</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cpq-container">
+
+                    <!-- LEFT: Product & Bundle Search -->
+                    <!-- LEFT: Product & Bundle Search -->
+    <div class="cpq-left">
+        <div class="cpq-search-section">
+            <h3 class="cpq-panel-title">{lbl.leftPanelTitle}</h3>
+            <lightning-input type="search" label={lbl.searchInputLabel}
+                placeholder={lbl.searchInputPlaceholder} value={productSearchQuery}
+                onchange={handleProductSearchChange} class="cpq-search-input">
+            </lightning-input>
+            <div class="cpq-search-results">
+                <!-- PRODUCTS -->
+                <template if:true={filteredProducts.length}>
+                    <template for:each={filteredProducts} for:item="prod">
+                        <div key={prod.id} class="cpq-search-result-item" draggable="true"
+                            ondragstart={handleProductDragStart} data-id={prod.id}
+                            data-productid={prod.productId} data-name={prod.name}
+                            data-price={prod.unitPrice} data-code={prod.productCode}
+                            data-family={prod.family} data-charge={prod.chargeType}>
+                            <div class="cpq-search-result-name">{prod.name}</div>
+                            <div class="cpq-search-result-meta">
+                                <span class="cpq-search-code">{prod.productCode}</span>
+                                <span class="cpq-search-family">{prod.family}</span>
+                                <span class="cpq-search-charge">{prod.chargeType}</span>
+                            </div>
+                            <div class="cpq-search-result-footer">
+                                <span class="cpq-search-price">{prod.unitPrice} {selectedCurrency}</span>
+                                <button type="button" class="cpq-quick-add-btn" data-id={prod.id}
+                                    data-productid={prod.productId} data-name={prod.name}
+                                    data-price={prod.unitPrice} data-code={prod.productCode}
+                                    data-family={prod.family} data-charge={prod.chargeType}
+                                    onclick={handleQuickAddProduct}>
+                                    {lbl.addBtn}
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <!-- BUNDLES -->
+                <template if:true={filteredBundles.length}>
+                    <div class="cpq-search-section-label">{lbl.bundlesSectionLabel}</div>
+                    <template for:each={filteredBundles} for:item="bundle">
+                        <div key={bundle.id} class="cpq-search-result-item cpq-bundle-search-item"
+                            draggable="true" ondragstart={handleBundleDragStart} data-id={bundle.id}
+                            data-name={bundle.name}>
+                            <div class="cpq-search-result-name">
+                                <span class="cpq-bundle-badge">{lbl.bundleBadge}</span>
+                                {bundle.name}
+                            </div>
+                            <div class="cpq-search-result-meta">
+                                <span class="cpq-search-family">{bundle.description}</span>
+                            </div>
+                            <div class="cpq-search-result-footer">
+                                <span class="cpq-search-price">{bundle.basePrice} {selectedCurrency}</span>
+                                <button type="button" class="cpq-quick-add-btn cpq-bundle-add-btn"
+                                    data-id={bundle.id} data-name={bundle.name}
+                                    onclick={handleSelectBundle}>
+                                    {lbl.addBtn}
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <!-- EMPTY STATE -->
+                <template if:false={filteredProducts.length}>
+                    <template if:false={filteredBundles.length}>
+                        <div class="cpq-search-empty">
+                            <p>{lbl.noResultsMsg} "<strong>{productSearchQuery}</strong>"</p>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </div>
+
+
+                    <!-- CENTER: Canvas -->
+                    <!-- CENTER: Canvas -->
+    <div class="cpq-center">
+        <div class="cpq-canvas-title slds-grid slds-grid_align-spread">
+            <span>{lbl.canvasTitle}</span>
+            <button type="button" class="cpq-clear-btn" onclick={handleClearCanvas}>
+                {lbl.clearCanvasBtn}
+            </button>
+        </div>
+        <div class="cpq-canvas" ondragover={handleCanvasDragOver} ondragleave={handleCanvasDragLeave} ondrop={handleCanvasDrop}>
+            <template if:true={canvasItems.length}>
+                <template for:each={canvasItems} for:item="item">
+                    <!-- PRODUCT ITEMS -->
+                    <template if:false={item.bundleProducts}>
+                        <div key={item.uid} class="cpq-canvas-item" style={item.style} data-uid={item.uid} onmousedown={handleCanvasItemMouseDown}>
+                            <div class="cpq-canvas-item-name">{item.name}</div>
+                            <div class="cpq-canvas-item-meta">
+                                <span class="cpq-canvas-code">{item.productCode}</span>
+                                <span class="cpq-canvas-family">{item.family}</span>
+                            </div>
+                            <div class="cpq-canvas-item-price">
+                                <template if:true={item.isDiscounted}>
+                                    <span class="cpq-old-price" style="text-decoration:line-through;color:#999;font-size:0.9em;">
+                                        {item.unitPrice} {selectedCurrency}</span>
+                                    <span class="cpq-net-price" style="color:#00AF91;font-weight:800;margin-left:5px;">
+                                        {item.unitNetPrice} {selectedCurrency}</span>
+                                </template>
+                                <template if:false={item.isDiscounted}>
+                                    <span class="cpq-label">Unit:</span>
+                                    {item.unitPrice} {selectedCurrency}
+                                </template>
+                            </div>
+                            <div class="cpq-canvas-item-qty">
+                                <input type="number" value={item.quantity} min="1" max="999" data-uid={item.uid} onchange={handleQuantityChange} class="cpq-qty-input" required>
+                                <span class="cpq-label">× {item.quantity}</span>
+                            </div>
+                            <div class="cpq-canvas-discount-row">
+                                <label class="cpq-canvas-discount-label">Disc. Amt</label>
+                                <div class="cpq-canvas-discount-wrap">
+                                    <input type="number" min="0" step="0.01" class="cpq-canvas-discount-input" value={item.manualDiscount} data-uid={item.uid} onchange={handleManualDiscountChange} placeholder="0.00" />
+                                    <span class="cpq-canvas-discount-symbol">{selectedCurrency}</span>
+                                </div>
+                                <template if:true={item.manualDiscount}>
+                                    <span class="cpq-canvas-discount-preview">-{item.manualDiscount}</span>
+                                </template>
+                            </div>
+                            <div class="cpq-canvas-item-total">
+                                Total: {item.lineTotal} {selectedCurrency}
+                            </div>
+                            <template if:true={item.isDiscounted}>
+                                <div class="cpq-canvas-discount-info">
+                                    <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
+                                        <span class="cpq-discount-badge">{item.discountPercent}% OFF</span>
+                                        <span style="font-size:10px;font-weight:700;color:#00AF91;">
+                                            -{item.discountAmount} {selectedCurrency}</span>
+                                    </div>
+                                    <div class="cpq-discount-detail">{item.discountReason}</div>
+                                </div>
+                            </template>
+                            <button type="button" class="cpq-canvas-item-remove" data-uid={item.uid} onclick={handleCanvasItemRemove}>×</button>
+                        </div>
+                    </template>
+                    <!-- BUNDLE ITEMS -->
+                    <template if:true={item.bundleProducts}>
+                        <div key={item.uid} class="cpq-bundle-canvas-item cpq-canvas-item-square" style={item.style} data-uid={item.uid} onmousedown={handleCanvasItemMouseDown}>
+                            <div class="cpq-bundle-canvas-header">
+                                <div class="cpq-bundle-canvas-name">{item.name}</div>
+                                <button type="button" class="cpq-bundle-canvas-remove" data-uid={item.uid} onclick={handleCanvasItemRemove}>×</button>
+                            </div>
+                            <div class="cpq-bundle-canvas-price">
+                                {item.lineTotal} {selectedCurrency}
+                            </div>
+                            <template if:true={item.discountPercent}>
+                                <div class="cpq-bundle-total-discount">
+                                    Save {item.discountPercent}%
+                                </div>
+                            </template>
+                            <div class="cpq-bundle-selected-summary">
+                                <template for:each={item.bundleProducts} for:item="bp">
+                                    <div key={bp.productCode} class="cpq-bundle-opt-row">
+                                        <span class="cpq-opt-name">{bp.name}</span>
+                                        <template if:true={bp.discountPercent}>
+                                            <span class="cpq-opt-disc-pill">-{bp.discountPercent}%</span>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="cpq-bundle-canvas-qty">
+                                <span class="cpq-qty-label">{lbl.colQty}:</span>
+                                <input type="number" value={item.quantity} min="1" max="999" data-uid={item.uid} onchange={handleQuantityChange} class="cpq-qty-input">
+                            </div>
+                            <button type="button" class="cpq-btn-modify" data-uid={item.uid} onclick={handleModifyBundle}>{lbl.modifyBtn}</button>
+                        </div>
+                    </template>
+                </template>
+            </template>
+            <template if:false={canvasItems.length}>
+                <div class="cpq-canvas-empty">
+                    <lightning-icon icon-name="utility:add" size="large"></lightning-icon>
+                    <p>{lbl.canvasEmptyMsg}</p>
+                </div>
+            </template>
+        </div>
+    </div>
+
+
+                    <!-- RIGHT: Quote Summary & Actions -->
+                    <!-- RIGHT: Quote Summary & Actions -->
+    <div class="cpq-right">
+        <h3 class="cpq-panel-title">{lbl.summaryTitle}</h3>
+
+        <div class="cpq-summary-list">
+            <template for:each={canvasItems} for:item="item">
+                <div key={item.uid} class="cpq-summary-row">
+                    <span class="cpq-summary-name">{item.name}</span>
+                    <span class="cpq-summary-qty">×{item.quantity}</span>
+                    <span class="cpq-summary-price">{item.lineTotal} {selectedCurrency}</span>
+                </div>
+            </template>
+            
+            <template if:false={canvasItems.length}>
+                <p class="slds-text-color_weak">{lbl.noItemsMsg}</p>
+            </template>
+        </div>
+
+        <div class="cpq-summary-divider"></div>
+
+        <div class="cpq-summary-totals">
+            <div class="cpq-summary-row cpq-subtotal">
+                <span>{lbl.subtotal}</span>
+                <strong>{subtotalPrice} {selectedCurrency}</strong>
+            </div>
+            <template if:true={hasDiscounts}>
+                <div class="cpq-summary-row cpq-discount-row">
+                    <span>{lbl.totalDiscount}</span>
+                    <strong class="cpq-discount-amount" style="color:#FF4F4F;">-{totalDiscountAmount} {selectedCurrency}</strong>
+                </div>
+            </template>
+            <div class="cpq-summary-row cpq-grand-total">
+                <span>{lbl.netTotal}</span>
+                <strong>{netPrice} {selectedCurrency}</strong>
+            </div>
+        </div>
+
+        <template if:true={hasDiscounts}>
+            <div class="cpq-summary-divider"></div>
+            <h4 style="color:#00AF91;font-size:11px;font-weight:800;margin-bottom:8px;">{lbl.discountDetailsLabel}</h4>
+            <div class="cpq-line-discounts slds-m-bottom_small">
+                <template for:each={canvasItems} for:item="item">
+                    <template if:true={item.discountPercent}>
+                        <div key={item.uid} class="slds-grid slds-grid_align-spread" style="font-size:11px;color:#00AF91;margin-bottom:4px;">
+                            <span>{item.name}</span>
+                            <strong>-{item.discountPercent}%</strong>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={discountBreakdown}>
+            <div class="cpq-discount-breakdown">
+                <h5>{lbl.appliedDiscountsLabel}</h5>
+                <p>{discountBreakdown}</p>
+            </div>
+        </template>
+
+        <!-- MANUAL DISCOUNT SECTION -->
+        <div class="cpq-summary-divider"></div>
+        <div class="cpq-manual-discount-panel">
+            <div class="cpq-manual-discount-header">
+                <lightning-icon icon-name="utility:currency" size="x-small" class="cpq-discount-icon"></lightning-icon>
+                <h4 class="cpq-manual-discount-title">Manual Discount Amount</h4>
+            </div>
+            <p class="cpq-manual-discount-hint">
+                Enter a discount amount in {selectedCurrency} per product. Applied before QCP calculation.
+            </p>
+            <template if:true={canvasItems.length}>
+                <div class="cpq-manual-discount-list">
+                    <template for:each={canvasItems} for:item="item">
+                        <div key={item.uid} class="cpq-manual-discount-row">
+                            <span class="cpq-manual-discount-name">{item.name}</span>
+                            <div class="cpq-manual-discount-input-wrap">
+                                <input type="number" min="0" step="0.01" class="cpq-manual-discount-input" value={item.manualDiscount} data-uid={item.uid} onchange={handleManualDiscountChange} placeholder="0.00" />
+                                <span class="cpq-manual-discount-symbol">{selectedCurrency}</span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <p class="cpq-manual-discount-note">
+                    QCP caps total discount at <strong>20%</strong> — click <strong>Calculate Discounts</strong> to apply.
+                </p>
+            </template>
+            <template if:false={canvasItems.length}>
+                <p class="cpq-manual-discount-empty">Add products to the canvas first.</p>
+            </template>
+        </div>
+
+        <!-- QUOTE STATUS CONFIGURATION -->
+        <div class="cpq-summary-divider"></div>
+        <div class="cpq-status-panel slds-m-bottom_medium">
+            <div class="cpq-status-panel-header">
+                <lightning-icon icon-name="utility:contract" size="x-small" class="cpq-status-icon"></lightning-icon>
+                <h4 class="cpq-status-panel-title">{lbl.quoteConfigTitle}</h4>
+            </div>
+            <div class="cpq-current-status-row">
+                <span class="cpq-current-status-label">{lbl.quoteStatusLabel}</span>
+                <span class={quoteStatusBadgeClass}>{quoteStatus}</span>
+            </div>
+            <lightning-combobox label={lbl.quoteStatusLabel} value={quoteStatus} options={quoteStatusOptions} onchange={handleQuoteStatusChange} class="cpq-status-combobox"></lightning-combobox>
+            <template if:true={isStatusChanged}>
+                <button type="button" class="cpq-status-save-btn" onclick={handleSaveQuoteStatus}>
+                    <lightning-icon icon-name="utility:save" size="x-small" class="cpq-status-save-icon"></lightning-icon>
+                    {lbl.saveQuoteStatusBtn}
+                </button>
+            </template>
+            <template if:true={isStatusInReview}>
+                <div class="cpq-status-warning">
+                    <lightning-icon icon-name="utility:warning" size="x-small"></lightning-icon>
+                    Quote is under review. Approval required before ordering.
+                </div>
+            </template>
+            <template if:true={isStatusApproved}>
+                <div class="cpq-status-approved-banner">
+                    <lightning-icon icon-name="utility:success" size="x-small"></lightning-icon>
+                    Quote approved. Ready to mark as ordered.
+                </div>
+            </template>
+        </div>
+
+        <!-- MAIN ACTIONS -->
+        <div class="cpq-actions">
+            <lightning-button label={lbl.addToQuoteBtn} variant="brand" onclick={handleAddToQuote} disabled={isAddToQuoteDisabled}></lightning-button>
+            <lightning-button label={lbl.calculateDiscountsBtn} variant="success" icon-name="utility:check" onclick={handleCalculateDiscounts} disabled={isCalculateDiscountsDisabled}></lightning-button>
+        </div>
+
+        <!-- MARK ORDERED -->
+        <template if:true={hasCpqLines}>
+            <div class="cpq-summary-divider"></div>
+            <div class="cpq-order-action-block">
+                <div class="cpq-order-action-label">
+                    <lightning-icon icon-name="utility:orders" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    {lbl.orderReadyLabel}
+                </div>
+                <template if:false={isOrdered}>
+                    <template if:false={isQuoteReadyToOrder}>
+                        <p style="color:#f44336; font-size:11px; font-weight:700; margin-top:8px;">
+                            <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small" variant="error"></lightning-icon>
+                            {lbl.statusWarningMsg}
+                        </p>
+                    </template>
+                    <lightning-button label={lbl.markOrderedBtn} variant="brand" icon-name="utility:check" onclick={handleMarkOrdered} disabled={isMarkOrderedDisabled} class="cpq-btn-full-width slds-m-top_small"></lightning-button>
+                </template>
+                <template if:true={isOrdered}>
+                    <div class="cpq-order-created-badge">
+                        <lightning-icon icon-name="utility:success" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        {lbl.orderCreatedPrefix} {orderNumber} {lbl.orderCreatedSuffix}
+                        <button type="button" class="cpq-link-btn" onclick={handleGoToOrderView}>{lbl.openOrderInterfaceLink}</button>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- SPINNER & ALERTS -->
+        <template if:true={isLoading}>
+            <div class="slds-grid slds-grid_align-center slds-m-top_small">
+                <lightning-spinner alternative-text={lbl.loadingMsg} size="small"></lightning-spinner>
+            </div>
+        </template>
+        <template if:true={errorMessage}>
+            <div class="cpq-alert cpq-alert-error slds-m-top_small" role="alert">
+                <lightning-icon icon-name="utility:error" size="small"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+        <template if:true={successMessage}>
+            <div class="cpq-alert cpq-alert-success slds-m-top_small" role="alert">
+                <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
+                <span>{successMessage}</span>
+            </div>
+        </template>
+    </div>
+</div>
+</template>
+
+            <template if:true={showOrderView}>
+                <c-cpq-order-interface
+                    labels={labelsConfig}
+                    current-lang={currentLang}
+                    quote-name={quoteName}
+                    order-number={orderNumber}
+                    order-status={orderStatus}
+                    order-status-options={orderStatusOptionsI18n}
+                    selected-currency={selectedCurrency}
+                    user-initials={userInitials}
+                    selected-account-name={selectedAccountName}
+                    is-order-activated={isOrderActivated}
+                    is-order-activating={isOrderActivating}
+                    is-contracted={isContracted}
+                    is-order-status-changed={isOrderStatusChanged}
+                    is-mark-contracted-disabled={isMarkContractedDisabled}
+                    order-lines={orderLines}
+                    order-total-amount={orderTotalAmount}
+                    contract-number={contractNumber}
+                    contract-status={contractStatus}
+                    is-loading={isLoading}
+                    error-message={errorMessage}
+                    success-message={successMessage}
+                    onbacktoquote={handleBackToQuote}
+                    onorderstatuschange={handleOrderStatusChange}
+                    onsaveorderstatus={handleSaveOrderStatus}
+                    onmarkcontracted={handleMarkContracted}
+                    ongotocontract={handleGoToContract}>
+                </c-cpq-order-interface>
+            </template>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════
+             BUNDLE CPQ CONFIGURATOR MODAL
+        ══════════════════════════════════════════════════════════ -->
+        <template if:true={showBundleConfigModal}>
+            <c-cpq-bundle-configurator
+                labels={labelsConfig}
+                current-lang={currentLang}
+                selected-currency={selectedCurrency}
+                onclose={handleCloseBundleModal}
+                onsaveconfig={handleSaveBundleConfigEvent}
+                ontoast={handleChildToast}>
+            </c-cpq-bundle-configurator>
+        </template>
+
+        <template if:true={showNewQuoteModal}>
+            <c-cpq-new-quote-modal 
+                labels={labelsConfig} 
+                current-lang={currentLang}
+                onclose={handleCloseNewQuoteModal}
+                onquotecreated={handleNewQuoteCreated}>
+            </c-cpq-new-quote-modal>
+        </template>
+
+    </lightning-card>
+</template>

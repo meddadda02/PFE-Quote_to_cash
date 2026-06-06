@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexaLink CPQ — Rapport PFE 2026</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0B1F3A;
+      --blue: #185FA5;
+      --teal: #0F6E56;
+      --teal-light: #1D9E75;
+      --amber: #BA7517;
+      --coral: #D85A30;
+      --white: #FFFFFF;
+      --offwhite: #F7F8FA;
+      --gray: #6B7280;
+      --light: #E8EDF4;
+      --border: #D1D9E6;
+      --code-bg: #0F1B2D;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--offwhite);
+      color: var(--navy);
+      line-height: 1.7;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy);
+      color: white;
+      padding: 80px 60px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #185FA520 0%, transparent 70%);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: 200px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #1D9E7515 0%, transparent 70%);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--teal-light);
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      letter-spacing: 0.05em;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      max-width: 700px;
+    }
+
+    .hero h1 span {
+      color: #5DCAA5;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: #9BB5D4;
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta-item {}
+
+    .hero-meta-item .label {
+      font-size: 11px;
+      color: #6B8BAD;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hero-meta-item .value {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--gray);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 16px 20px;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .nav a:hover {
+      color: var(--navy);
+      border-bottom-color: var(--blue);
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 60px;
+    }
+
+    .section {
+      margin-bottom: 80px;
+    }
+
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .section h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--light);
+    }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    /* ── STATUS BADGES ── */
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .badge-done {
+      background: #E1F5EE;
+      color: #085041;
+    }
+
+    .badge-progress {
+      background: #FFF3E0;
+      color: #854F0B;
+    }
+
+    .badge-todo {
+      background: #F1EFE8;
+      color: #5F5E5A;
+    }
+
+    /* ── TABLES ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: var(--navy);
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+    }
+
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #F7F9FC;
+    }
+
+    /* ── CODE ── */
+    .code-block {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #A8D8B9;
+      line-height: 1.8;
+    }
+
+    .code-comment {
+      color: #4B6A8A;
+    }
+
+    .code-keyword {
+      color: #79C0FF;
+    }
+
+    .code-string {
+      color: #A5D6FF;
+    }
+
+    .code-number {
+      color: #F97583;
+    }
+
+    /* ── LIFECYCLE ── */
+    .lifecycle {
+      background: var(--navy);
+      border-radius: 16px;
+      padding: 40px;
+      color: white;
+      margin-bottom: 32px;
+    }
+
+    .lifecycle-top {
+      background: var(--blue);
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-align: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 32px;
+      letter-spacing: 0.05em;
+    }
+
+    .lifecycle-stages {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .stage-item {
+      flex: 1;
+      min-width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .stage-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: 2px solid transparent;
+      transition: transform 0.2s;
+    }
+
+    .stage-circle:hover {
+      transform: scale(1.1);
+    }
+
+    .stage-circle.done {
+      background: #1D9E7520;
+      border-color: #1D9E75;
+    }
+
+    .stage-circle.upcoming {
+      background: #185FA520;
+      border-color: #378ADD;
+    }
+
+    .stage-label {
+      font-size: 11px;
+      color: #9BB5D4;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .stage-sub {
+      font-size: 10px;
+      color: #4B6A8A;
+      text-align: center;
+      max-width: 90px;
+    }
+
+    .stage-arrow {
+      padding-top: 14px;
+      color: #2D4A6A;
+      font-size: 14px;
+      flex: 0 0 16px;
+      text-align: center;
+    }
+
+    .lifecycle-phases {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .phase-pill {
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .phase-done {
+      background: #1D9E7520;
+      border: 1px solid #1D9E7540;
+      color: #5DCAA5;
+    }
+
+    .phase-upcoming {
+      background: #185FA520;
+      border: 1px solid #185FA540;
+      color: #85B7EB;
+    }
+
+    .phase-label {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .phase-sub {
+      font-size: 10px;
+      color: #4B6A8A;
+    }
+
+    /* ── DIAGRAM ── */
+    .diagram-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .diagram-box h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--navy);
+    }
+
+    /* ── SEQUENCE ── */
+    .sequence {
+      display: grid;
+      gap: 0;
+    }
+
+    .seq-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 120px 1fr 120px 1fr 120px;
+      align-items: center;
+      min-height: 48px;
+    }
+
+    .seq-actor {
+      background: var(--navy);
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 10px 8px;
+      text-align: center;
+      border-radius: 6px;
+    }
+
+    .seq-line {
+      height: 2px;
+      background: var(--border);
+      position: relative;
+    }
+
+    .seq-line::after {
+      content: '›';
+      position: absolute;
+      right: -6px;
+      top: -10px;
+      color: var(--blue);
+      font-size: 18px;
+    }
+
+    .seq-msg {
+      font-size: 11px;
+      color: var(--blue);
+      text-align: center;
+      padding: 2px 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── USE CASE ── */
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .usecase-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .usecase-actor {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .usecase-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .usecase-card ul {
+      list-style: none;
+    }
+
+    .usecase-card ul li {
+      font-size: 12px;
+      color: var(--gray);
+      padding: 3px 0;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .usecase-card ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--teal-light);
+    }
+
+    /* ── CLASS DIAGRAM ── */
+    .class-diagram {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .class-box {
+      border: 1.5px solid var(--navy);
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 200px;
+      flex: 1;
+      max-width: 280px;
+    }
+
+    .class-header {
+      background: var(--navy);
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 14px;
+    }
+
+    .class-section {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .class-section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .class-field {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--navy);
+      padding: 2px 0;
+    }
+
+    .class-field .type {
+      color: var(--blue);
+    }
+
+    .class-method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--teal);
+      padding: 2px 0;
+    }
+
+    /* ── NEXT STEPS ── */
+    .next-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .next-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .next-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .next-card.phase1::before {
+      background: var(--teal-light);
+    }
+
+    .next-card.phase2::before {
+      background: var(--blue);
+    }
+
+    .next-card.phase3::before {
+      background: var(--coral);
+    }
+
+    .next-month {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .next-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .next-card ul {
+      list-style: none;
+    }
+
+    .next-card ul li {
+      font-size: 13px;
+      padding: 5px 0;
+      padding-left: 16px;
+      position: relative;
+      color: var(--gray);
+      border-bottom: 1px solid #F1F3F6;
+    }
+
+    .next-card ul li:last-child {
+      border-bottom: none;
+    }
+
+    .next-card ul li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      font-size: 11px;
+    }
+
+    .phase1 li::before {
+      color: var(--teal-light);
+    }
+
+    .phase2 li::before {
+      color: var(--blue);
+    }
+
+    .phase3 li::before {
+      color: var(--coral);
+    }
+
+    /* ── RESOURCES ── */
+    .resource-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .resource-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .resource-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .resource-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .resource-card p {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    /* ── QCP DISCOUNT TABLE ── */
+    .discount-table {
+      font-size: 12px;
+    }
+
+    .discount-table th {
+      font-size: 11px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--navy);
+      color: #6B8BAD;
+      padding: 40px 60px;
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .footer-brand span {
+      color: #5DCAA5;
+    }
+
+    .footer p {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge">PFE 2026 · Inetum · Salesforce CPQ</div>
+    <h1>NexaLink<br><span>Quote-to-Cash</span><br>Architecture</h1>
+    <p class="hero-sub">Enterprise CPQ + Revenue Cloud hybridization for a Moroccan telecom operator — 6 commercial
+      bundles, 3 currencies, 3 languages.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="label">Author</div>
+        <div class="value">Mohammed Dadda</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Company</div>
+        <div class="value">Inetum</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Timeline</div>
+        <div class="value">6 Months · 2026</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Status</div>
+        <div class="value">Month 1–2 · 80% ✓</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Products</div>
+        <div class="value">198 Products</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Bundles</div>
+        <div class="value">6 Bundles</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NAV ── -->
+  <nav class="nav">
+    <a href="#overview">Overview</a>
+    <a href="#lifecycle">Lifecycle</a>
+    <a href="#catalog">Product Catalog</a>
+    <a href="#pricing">Pricing & QCP</a>
+    <a href="#class">Class Diagram</a>
+    <a href="#sequence">Sequence</a>
+    <a href="#usecase">Use Cases</a>
+    <a href="#status">Status</a>
+    <a href="#nextsteps">Next Steps</a>
+    <a href="#resources">Resources</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="section" id="overview">
+      <div class="section-tag">01 · Project Overview</div>
+      <h2>System Architecture</h2>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon" style="background:#E1F5EE;">📦</div>
+          <h3>L1 — Product Catalog</h3>
+          <p>198 products across 3 price books (MAD, USD, EUR). 6 bundle families with Feature/Option/Constraint
+            configuration.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#E6F1FB;">⚙️</div>
+          <h3>L2 — Bundle Configuration</h3>
+          <p>6 bundles · 32+ Option Constraints (Exclusion + Dependency) · Feature Min/Max enforcement inside
+            configurator scope.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#EEEDFE;">🛡️</div>
+          <h3>L3 — Rules & Validation</h3>
+          <p>12 Product Rules · 5 Validation · 5 Alert · 2 Selection. Summary Variables prevent false positives.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#FAEEDA;">💰</div>
+          <h3>L4 — Pricing Engine</h3>
+          <p>4 Price Rules + QCP JavaScript (15 scenarios) · 20% discount cap · Proportional global distribution.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#FAECE7;">🌍</div>
+          <h3>L5 — Internationalization</h3>
+          <p>Multi-Currency (MAD/USD/EUR) · Auto-detection via Flow + Custom Metadata · EN/FR Quote Templates.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#EEEDFE;">🔄</div>
+          <h3>Revenue Cloud Handoff</h3>
+          <p>CPQ handles quoting. Revenue Cloud handles billing post-signature. Clean handoff at the Order object.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <tr>
+            <th>Layer</th>
+            <th>Component</th>
+            <th>Details</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>Business Flow</td>
+            <td>Quote-to-Cash</td>
+            <td>Lead → Opportunity → Quote → E-Sign → Order → Contract → Invoice → Payment</td>
+            <td><span class="badge badge-progress">In Progress</span></td>
+          </tr>
+          <tr>
+            <td>Actors</td>
+            <td>Sales Rep</td>
+            <td>Creates and submits quotes</td>
+            <td><span class="badge badge-done">Active</span></td>
+          </tr>
+          <tr>
+            <td>Actors</td>
+            <td>Customer</td>
+            <td>Signs electronically via DocuSign</td>
+            <td><span class="badge badge-todo">Month 5–6</span></td>
+          </tr>
+          <tr>
+            <td>Actors</td>
+            <td>Sales Manager</td>
+            <td>Approves high-discount quotes</td>
+            <td><span class="badge badge-todo">Not Started</span></td>
+          </tr>
+          <tr>
+            <td>Actors</td>
+            <td>Finance</td>
+            <td>Manages invoices and payments</td>
+            <td><span class="badge badge-todo">Month 5–6</span></td>
+          </tr>
+          <tr>
+            <td>Actors</td>
+            <td>CPQ Admin</td>
+            <td>Maintains catalog and rules</td>
+            <td><span class="badge badge-done">Active</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── LIFECYCLE ── -->
+    <div class="section" id="lifecycle">
+      <div class="section-tag">02 · Project Lifecycle</div>
+      <h2>Quote-to-Cash Lifecycle</h2>
+      <div class="lifecycle">
+        <div class="lifecycle-top">Agentforce & Automation Layer</div>
+        <div class="lifecycle-stages">
+          <div class="stage-item">
+            <div class="stage-circle done">📦</div>
+            <div class="stage-label">Catalog</div>
+            <div class="stage-sub">198 products · 3 currencies</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle done">⚙️</div>
+            <div class="stage-label">Configure</div>
+            <div class="stage-sub">6 bundles · 32+ constraints</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle done">💰</div>
+            <div class="stage-label">Price & Approve</div>
+            <div class="stage-sub">QCP · Price Rules</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle done">📄</div>
+            <div class="stage-label">Quote & Propose</div>
+            <div class="stage-sub">EN/FR Templates</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle upcoming">✍️</div>
+            <div class="stage-label">E-Sign</div>
+            <div class="stage-sub">DocuSign · Month 5</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle upcoming">🔄</div>
+            <div class="stage-label">Orders</div>
+            <div class="stage-sub">Auto-created post-sign</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle upcoming">🗂️</div>
+            <div class="stage-label">Assets</div>
+            <div class="stage-sub">Subscriptions · Contracts</div>
+          </div>
+          <div class="stage-arrow">›</div>
+          <div class="stage-item">
+            <div class="stage-circle upcoming">🧾</div>
+            <div class="stage-label">Billing</div>
+            <div class="stage-sub">Invoices · Payments</div>
+          </div>
+        </div>
+        <div class="lifecycle-phases">
+          <div class="phase-pill phase-done">
+            <div class="phase-label">Month 1–2 · CPQ Core ✓ 80%</div>
+            <div class="phase-sub">Catalog · Bundles · Pricing · QCP · Multi-currency · Flow</div>
+          </div>
+          <div class="phase-pill phase-upcoming">
+            <div class="phase-label">Month 3–4 · LWC Configurator</div>
+            <div class="phase-sub">Visual Product Configurator · Drag & Drop · CPQ API</div>
+          </div>
+          <div class="phase-pill phase-upcoming">
+            <div class="phase-label">Month 5–6 · E-Sign + Billing</div>
+            <div class="phase-sub">DocuSign · Revenue Cloud · Apex Tests · AvaTax</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUCT CATALOG ── -->
+    <div class="section" id="catalog">
+      <div class="section-tag">03 · Product Catalog</div>
+      <h2>Bundles & Product Families</h2>
+      <div class="table-wrap">
+        <table>
+          <tr>
+            <th>Bundle Code</th>
+            <th>Bundle Name</th>
+            <th>Key Products</th>
+            <th>Charge Type</th>
+          </tr>
+          <tr>
+            <td><code>MOB-Bun</code></td>
+            <td>B1 — 5G+ Freedom Pack</td>
+            <td>iPhone 16, Unlimited Plan, Data Add-ons</td>
+            <td>Recurring + One-Time</td>
+          </tr>
+          <tr>
+            <td><code>BND-TV-HOME</code></td>
+            <td>B2 — Optik Stream+ Hub</td>
+            <td>Fiber 500/1G, Smart TV, WiFi Booster, Install</td>
+            <td>Recurring + One-Time</td>
+          </tr>
+          <tr>
+            <td><code>BND-SMART-SEC</code></td>
+            <td>B3 — SmartHome Guardian</td>
+            <td>SH-SEC, Cameras, Automation, Install</td>
+            <td>Recurring + One-Time</td>
+          </tr>
+          <tr>
+            <td><code>BND-BIZ-CONN</code></td>
+            <td>B4 — Pro Connect Pack</td>
+            <td>Business Fiber 1G/2G/3G, Office Security</td>
+            <td>Recurring</td>
+          </tr>
+          <tr>
+            <td><code>BND-SECURE-ENTRY</code></td>
+            <td>B5 — Secure Entry Pack</td>
+            <td>Smart Lock, Fingerprint, Battery, Install</td>
+            <td>One-Time</td>
+          </tr>
+          <tr>
+            <td><code>MOB-FAMILY-SHARE-PACK</code></td>
+            <td>B6 — Family Share Pack</td>
+            <td>Primary Plan, 8 Lines, Device Protection</td>
+            <td>Recurring</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <tr>
+            <th>Product Type</th>
+            <th>Subscription</th>
+            <th>Charge Type</th>
+            <th>Pricing</th>
+          </tr>
+          <tr>
+            <td>Plans (Mobile, Fiber)</td>
+            <td>Renewable</td>
+            <td>Recurring Monthly</td>
+            <td>Fixed Price</td>
+          </tr>
+          <tr>
+            <td>Hardware (Devices, TV)</td>
+            <td>None</td>
+            <td>One-Time</td>
+            <td>List Price</td>
+          </tr>
+          <tr>
+            <td>Bundle Parent</td>
+            <td>None</td>
+            <td>None</td>
+            <td>MAD 0.00</td>
+          </tr>
+          <tr>
+            <td>Services (Install, Delivery)</td>
+            <td>None</td>
+            <td>One-Time</td>
+            <td>Fixed / Free w/ Rules</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── PRICING ── -->
+    <div class="section" id="pricing">
+      <div class="section-tag">04 · Pricing Engine & QCP</div>
+      <h2>Discount Logic & QCP JavaScript</h2>
+
+      <div class="table-wrap">
+        <table class="discount-table">
+          <tr>
+            <th>Scenario</th>
+            <th>Trigger</th>
+            <th>Discount</th>
+            <th>Target</th>
+            <th>Type</th>
+          </tr>
+          <tr>
+            <td>Employee</td>
+            <td>Customer_Type = Employee</td>
+            <td>80 MAD flat</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>Student</td>
+            <td>Customer_Type = Student</td>
+            <td>30 MAD flat</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>Loyalty ≤ 0 yr</td>
+            <td>Is_Existing_Customer__c</td>
+            <td>40 MAD</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>Loyalty 1 yr</td>
+            <td>Is_Existing_Customer__c</td>
+            <td>60 MAD</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>Loyalty 2+ yr</td>
+            <td>Is_Existing_Customer__c</td>
+            <td>80 MAD</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>New Customer</td>
+            <td>Customer_Type = New</td>
+            <td>40 MAD flat</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>Ramadan</td>
+            <td>Is_Ramadan_Period__c</td>
+            <td>30 MAD flat</td>
+            <td>All lines</td>
+            <td>Global</td>
+          </tr>
+          <tr>
+            <td>Multi-Bundle</td>
+            <td>bundleCount ≥ 2</td>
+            <td>15%</td>
+            <td>Recurring lines</td>
+            <td>Line</td>
+          </tr>
+          <tr>
+            <td>Home+Mobile Combo</td>
+            <td>hasMobile AND hasHome</td>
+            <td>20%</td>
+            <td>Recurring lines</td>
+            <td>Line</td>
+          </tr>
+          <tr>
+            <td>Device Volume</td>
+            <td>deviceCount ≥ 3</td>
+            <td>10%</td>
+            <td>Devices family</td>
+            <td>Line</td>
+          </tr>
+          <tr>
+            <td>Free Install</td>
+            <td>bundleCount ≥ 2</td>
+            <td>100%</td>
+            <td>SRV-INST</td>
+            <td>Exempt</td>
+          </tr>
+          <tr>
+            <td>Free WiFi Booster</td>
+            <td>hasFiber = true</td>
+            <td>100%</td>
+            <td>HW-WIFI-BOOST</td>
+            <td>Exempt</td>
+          </tr>
+          <tr>
+            <td>Student Premium</td>
+            <td>isStudent = true</td>
+            <td>100%</td>
+            <td>ADD-TV-PREMIUM</td>
+            <td>Exempt</td>
+          </tr>
+          <tr>
+            <td>Currency Conversion</td>
+            <td>CurrencyIsoCode ≠ MAD</td>
+            <td>× rate</td>
+            <td>All global amounts</td>
+            <td>System</td>
+          </tr>
+          <tr>
+            <td>Discount Cap</td>
+            <td>All non-exempt lines</td>
+            <td>Max 20%</td>
+            <td>Per line total</td>
+            <td>Guard</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <pre><span class="code-comment">// QCP — 3-Pass Discount Architecture</span>
+
+<span class="code-comment">// PASS 1 — Analyse lines (bundle count, device count, combo flags)</span>
+<span class="code-keyword">lines</span>.forEach(<span class="code-keyword">function</span>(line) {
+  <span class="code-keyword">if</span> (family === <span class="code-string">'Bundles'</span> && !bundleCodes[code]) bundleCount++;
+  <span class="code-keyword">if</span> (family === <span class="code-string">'Devices'</span>) deviceCount += qty;
+  <span class="code-keyword">if</span> (code === <span class="code-string">'MOB-Bun'</span>) hasMobile = <span class="code-keyword">true</span>;
+  <span class="code-keyword">if</span> (code === <span class="code-string">'BND-TV-HOME'</span>) hasHome = <span class="code-keyword">true</span>;
+});
+
+<span class="code-comment">// PASS 2 — Calculate line discounts (20% cap, exempt codes)</span>
+<span class="code-keyword">lines</span>.forEach(<span class="code-keyword">function</span>(line, idx) {
+  line.record[<span class="code-string">'SBQQ__AdditionalDiscountAmount__c'</span>] = <span class="code-keyword">null</span>; <span class="code-comment">// FIX: reset first</span>
+  line.record[<span class="code-string">'SBQQ__AdditionalDiscount__c'</span>] = <span class="code-keyword">null</span>;
+  <span class="code-keyword">if</span> (!isExempt && base > <span class="code-number">0</span>) {
+    <span class="code-keyword">var</span> maxLineDisc = base * <span class="code-number">0.2</span>; <span class="code-comment">// 20% hard cap</span>
+    <span class="code-keyword">if</span> (lineDisc > maxLineDisc) lineDisc = maxLineDisc;
+  }
+});
+
+<span class="code-comment">// PASS 3 — Distribute global discount proportionally</span>
+lineShare = (ld.net / totalNet) * globalDiscount;
+line.record[<span class="code-string">'SBQQ__NetPrice__c'</span>] = Math.max(ld.net - lineShare, <span class="code-number">0</span>);</pre>
+      </div>
+    </div>
+
+    <!-- ── CLASS DIAGRAM ── -->
+    <div class="section" id="class">
+      <div class="section-tag">05 · Class Diagram</div>
+      <h2>Salesforce CPQ Object Model</h2>
+      <div class="diagram-box">
+        <div class="class-diagram">
+          <div class="class-box">
+            <div class="class-header">Account</div>
+            <div class="class-section">
+              <div class="class-section-label">Custom Fields</div>
+              <div class="class-field">Is_Student__c : <span class="type">Boolean</span></div>
+              <div class="class-field">Is_Telecom_Employee__c : <span class="type">Boolean</span></div>
+              <div class="class-field">Is_Existing_Customer__c : <span class="type">Boolean</span></div>
+              <div class="class-field">Is_New_Customer__c : <span class="type">Boolean</span></div>
+              <div class="class-field">Customer_Type__c : <span class="type">Picklist</span></div>
+            </div>
+            <div class="class-section">
+              <div class="class-section-label">Relations</div>
+              <div class="class-field">1 ──── * SBQQ__Quote__c</div>
+              <div class="class-field">1 ──── * Order</div>
+            </div>
+          </div>
+          <div class="class-box">
+            <div class="class-header">SBQQ__Quote__c</div>
+            <div class="class-section">
+              <div class="class-section-label">Key Fields</div>
+              <div class="class-field">CurrencyIsoCode : <span class="type">String</span></div>
+              <div class="class-field">Is_Ramadan_Period__c : <span class="type">Boolean</span></div>
+              <div class="class-field">Customer_Type__c : <span class="type">Picklist</span></div>
+              <div class="class-field">SBQQ__Status__c : <span class="type">Picklist</span></div>
+              <div class="class-field">SBQQ__Primary__c : <span class="type">Boolean</span></div>
+              <div class="class-field">SBQQ__Ordered__c : <span class="type">Boolean</span></div>
+              <div class="class-field">SBQQ__StartDate__c : <span class="type">Date</span></div>
+              <div class="class-field">SBQQ__SubscriptionTerm__c : <span class="type">Number</span></div>
+            </div>
+            <div class="class-section">
+              <div class="class-section-label">Relations</div>
+              <div class="class-field">* ──── 1 Account</div>
+              <div class="class-field">1 ──── * SBQQ__QuoteLine__c</div>
+              <div class="class-field">* ──── 1 Opportunity</div>
+            </div>
+          </div>
+          <div class="class-box">
+            <div class="class-header">SBQQ__QuoteLine__c</div>
+            <div class="class-section">
+              <div class="class-section-label">Key Fields</div>
+              <div class="class-field">SBQQ__ProductCode__c : <span class="type">String</span></div>
+              <div class="class-field">SBQQ__ProductFamily__c : <span class="type">String</span></div>
+              <div class="class-field">SBQQ__ListPrice__c : <span class="type">Currency</span></div>
+              <div class="class-field">SBQQ__NetPrice__c : <span class="type">Currency</span></div>
+              <div class="class-field">SBQQ__CustomerPrice__c : <span class="type">Currency</span></div>
+              <div class="class-field">SBQQ__Quantity__c : <span class="type">Number</span></div>
+              <div class="class-field">SBQQ__ChargeType__c : <span class="type">Picklist</span></div>
+              <div class="class-field">Discount_Breakdown__c : <span class="type">LongText</span></div>
+              <div class="class-field">Manual_Discount_Amt__c : <span class="type">Currency</span></div>
+            </div>
+            <div class="class-section">
+              <div class="class-section-label">Relations</div>
+              <div class="class-field">* ──── 1 SBQQ__Quote__c</div>
+              <div class="class-field">* ──── 1 Product2</div>
+            </div>
+          </div>
+          <div class="class-box">
+            <div class="class-header">Product2</div>
+            <div class="class-section">
+              <div class="class-section-label">Key Fields</div>
+              <div class="class-field">ProductCode : <span class="type">String</span></div>
+              <div class="class-field">Family : <span class="type">Picklist</span></div>
+              <div class="class-field">SBQQ__Configurable__c : <span class="type">Boolean</span></div>
+              <div class="class-field">SBQQ__SubscriptionType__c : <span class="type">Picklist</span></div>
+            </div>
+            <div class="class-section">
+              <div class="class-section-label">Relations</div>
+              <div class="class-field">1 ──── * SBQQ__ProductFeature__c</div>
+              <div class="class-field">1 ──── * PricebookEntry</div>
+            </div>
+          </div>
+          <div class="class-box">
+            <div class="class-header">Order</div>
+            <div class="class-section">
+              <div class="class-section-label">Key Fields</div>
+              <div class="class-field">Status : <span class="type">Picklist</span></div>
+              <div class="class-field">OrderStartDate : <span class="type">Date</span></div>
+              <div class="class-field">TotalAmount : <span class="type">Currency</span></div>
+              <div class="class-field">SBQQ__Quote__c : <span class="type">Lookup</span></div>
+            </div>
+            <div class="class-section">
+              <div class="class-section-label">Relations</div>
+              <div class="class-field">1 ──── * OrderItem</div>
+              <div class="class-field">1 ──── * Contract</div>
+              <div class="class-field">* ──── 1 Account</div>
+            </div>
+          </div>
+          <div class="class-box">
+            <div class="class-header">SBQQ__CustomScript__c</div>
+            <div class="class-section">
+              <div class="class-section-label">QCP Config</div>
+              <div class="class-field">Name : QuoteCalculatorPlugin</div>
+              <div class="class-field">SBQQ__Code__c : <span class="type">JS Code</span></div>
+            </div>
+            <div class="class-section">
+              <div class="class-section-label">Methods</div>
+              <div class="class-method">onBeforeCalculate()</div>
+              <div class="class-method">onAfterCalculate()</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SEQUENCE DIAGRAM ── -->
+    <div class="section" id="sequence">
+      <div class="section-tag">06 · Sequence Diagram</div>
+      <h2>Quote Creation Flow</h2>
+      <div class="diagram-box">
+        <h3>End-to-End Quote Flow</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Step</th>
+              <th>Actor</th>
+              <th>Action</th>
+              <th>System Response</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Sales Rep</td>
+              <td>Opens new Quote on Opportunity</td>
+              <td>Flow fires → reads User.Country → sets CurrencyIsoCode from Metadata</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Sales Rep</td>
+              <td>Sets Subscription Term + Customer Type + Ramadan flag</td>
+              <td>Quote fields updated</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Sales Rep</td>
+              <td>Adds bundle → Configurator opens</td>
+              <td>Option Constraints fire → real-time grayout</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Sales Rep</td>
+              <td>Saves configurator</td>
+              <td>Product Rules fire → Selection Rules auto-add SRV-DEL, TV-BASIC</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>CPQ Engine</td>
+              <td>Calculate triggered</td>
+              <td>Price Rules fire → QCP onAfterCalculate → 3-pass discount → Discount_Breakdown__c written</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Sales Rep</td>
+              <td>Generate PDF</td>
+              <td>EN or FR template selected → PDF rendered with merge fields</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Customer</td>
+              <td>Signs electronically (Month 5–6)</td>
+              <td>DocuSign webhook → Flow → Order created → Revenue Cloud activated</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Revenue Cloud</td>
+              <td>Billing automation (Month 5–6)</td>
+              <td>Billing schedules → Monthly invoices → Payments collected</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <h3>QCP Calculation Sequence</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Pass</th>
+              <th>Action</th>
+              <th>Output</th>
+            </tr>
+            <tr>
+              <td>Pre-Pass</td>
+              <td>Reset SBQQ__AdditionalDiscountAmount__c, SBQQ__AdditionalDiscount__c, SBQQ__SpecialPrice__c = null
+              </td>
+              <td>Clean state — no poisoned values from Price Rules</td>
+            </tr>
+            <tr>
+              <td>Pass 1</td>
+              <td>Loop all lines → count bundles, devices, detect Mobile/Home/Fiber flags</td>
+              <td>bundleCount, deviceCount, hasMobile, hasHome, hasFiber</td>
+            </tr>
+            <tr>
+              <td>Global Calc</td>
+              <td>Query Account → compute Employee/Student/Loyalty/New/Ramadan amounts → convert to local currency via
+                toLocal()</td>
+              <td>globalDiscount, globalLabel</td>
+            </tr>
+            <tr>
+              <td>Pass 2</td>
+              <td>Per-line: apply Price Rule discounts, free products, bundle combo %, device volume → cap at 20%</td>
+              <td>lineDisc, net per line, totalNet</td>
+            </tr>
+            <tr>
+              <td>Pass 3</td>
+              <td>Distribute globalDiscount proportionally: lineShare = (net/totalNet) × globalDiscount → enforce 20%
+                total cap</td>
+              <td>SBQQ__NetPrice__c, SBQQ__CustomerPrice__c, Discount_Breakdown__c</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USE CASES ── -->
+    <div class="section" id="usecase">
+      <div class="section-tag">07 · Use Cases</div>
+      <h2>Actor Use Cases</h2>
+      <div class="usecase-grid">
+        <div class="usecase-card">
+          <div class="usecase-actor">Sales Rep</div>
+          <h4>Quote Management</h4>
+          <ul>
+            <li>Create quote on opportunity</li>
+            <li>Configure bundles & options</li>
+            <li>Apply customer type & context</li>
+            <li>Calculate pricing</li>
+            <li>Generate PDF (EN/FR)</li>
+            <li>Submit for approval</li>
+            <li>Convert quote to order</li>
+          </ul>
+        </div>
+        <div class="usecase-card" style="border-left-color: var(--teal-light);">
+          <div class="usecase-actor" style="color: var(--teal-light);">CPQ Admin</div>
+          <h4>Catalog Management</h4>
+          <ul>
+            <li>Maintain 198 products</li>
+            <li>Configure bundle features/options</li>
+            <li>Manage price books (MAD/USD/EUR)</li>
+            <li>Update QCP JavaScript</li>
+            <li>Configure Price Rules</li>
+            <li>Manage translations</li>
+            <li>Update Custom Metadata</li>
+          </ul>
+        </div>
+        <div class="usecase-card" style="border-left-color: var(--amber);">
+          <div class="usecase-actor" style="color: var(--amber);">Sales Manager</div>
+          <h4>Approval & Oversight</h4>
+          <ul>
+            <li>Review high-discount quotes</li>
+            <li>Approve or reject quotes</li>
+            <li>Monitor discount compliance</li>
+            <li>Override pricing exceptions</li>
+          </ul>
+        </div>
+        <div class="usecase-card" style="border-left-color: var(--coral);">
+          <div class="usecase-actor" style="color: var(--coral);">Customer</div>
+          <h4>Self-Service</h4>
+          <ul>
+            <li>Receive quote PDF</li>
+            <li>Review pricing & bundles</li>
+            <li>Sign electronically (DocuSign)</li>
+            <li>Receive invoice monthly</li>
+            <li>Make payments</li>
+          </ul>
+        </div>
+        <div class="usecase-card" style="border-left-color: var(--navy);">
+          <div class="usecase-actor" style="color: var(--navy);">Finance</div>
+          <h4>Billing & Revenue</h4>
+          <ul>
+            <li>Review billing schedules</li>
+            <li>Manage invoices</li>
+            <li>Track payments</li>
+            <li>Revenue recognition</li>
+            <li>Handle collections</li>
+          </ul>
+        </div>
+        <div class="usecase-card" style="border-left-color: #7F77DD;">
+          <div class="usecase-actor" style="color: #7F77DD;">CPQ System</div>
+          <h4>Automation</h4>
+          <ul>
+            <li>Auto-set currency by country</li>
+            <li>Auto-add TV-BASIC on TV select</li>
+            <li>Auto-add SRV-DEL on TV</li>
+            <li>Block invalid combos</li>
+            <li>Cap discounts at 20%</li>
+            <li>Create order from quote</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STATUS ── -->
+    <div class="section" id="status">
+      <div class="section-tag">08 · Implementation Status</div>
+      <h2>Current Progress</h2>
+      <div class="table-wrap">
+        <table>
+          <tr>
+            <th>Area</th>
+            <th>Details</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>Product Catalog</td>
+            <td>198 products · MAD/USD/EUR price books</td>
+            <td><span class="badge badge-done">✓ Complete</span></td>
+          </tr>
+          <tr>
+            <td>Bundle Configuration</td>
+            <td>6 bundles · Feature/Option/Constraint</td>
+            <td><span class="badge badge-done">✓ Complete</span></td>
+          </tr>
+          <tr>
+            <td>Option Constraints</td>
+            <td>32+ Exclusion + Dependency rules</td>
+            <td><span class="badge badge-done">✓ Complete</span></td>
+          </tr>
+          <tr>
+            <td>Product Rules</td>
+            <td>12 rules · Validation + Alert + Selection</td>
+            <td><span class="badge badge-done">✓ Complete</span></td>
+          </tr>
+          <tr>
+            <td>Summary Variables</td>
+            <td>7 SVs · Fiber + Bundle + Device + Combo</td>
+            <td><span class="badge badge-done">✓ Complete</span></td>
+          </tr>
+          <tr>
+            <td>Price Rules</td>
+            <td>PR1 WiFi Free · PR2 Multi-bundle · PR3 Install · PR4 Combo</td>
+            <td><span class="badge badge-progress">⚡ Needs Test</span></td>
+          </tr>
+          <tr>
+            <td>QCP JavaScript</td>
+            <td>15 scenarios · 3-pass · 20% cap · currency-aware</td>
+            <td><span class="badge badge-progress">⚡ Written — Testing</span></td>
+          </tr>
+          <tr>
+            <td>Multi-Currency</td>
+            <td>MAD/USD/EUR · dated exchange rates</td>
+            <td><span class="badge badge-done">✓ Complete</span></td>
+          </tr>
+          <tr>
+            <td>Flow Auto-Currency</td>
+            <td>Country → Metadata → CurrencyIsoCode</td>
+            <td><span class="badge badge-done">✓ Active</span></td>
+          </tr>
+          <tr>
+            <td>Quote Templates</td>
+            <td>EN + FR created · sections configured</td>
+            <td><span class="badge badge-progress">⚡ In Progress</span></td>
+          </tr>
+          <tr>
+            <td>Order Generation</td>
+            <td>Ordered checkbox flow · CPQ auto-transfer</td>
+            <td><span class="badge badge-progress">⚡ Testing</span></td>
+          </tr>
+          <tr>
+            <td>Translations FR/AR</td>
+            <td>Translation Workbench entries</td>
+            <td><span class="badge badge-todo">✗ Not Started</span></td>
+          </tr>
+          <tr>
+            <td>Approval Workflow</td>
+            <td>High-discount quote approval</td>
+            <td><span class="badge badge-todo">✗ Not Started</span></td>
+          </tr>
+          <tr>
+            <td>LWC Configurator</td>
+            <td>Visual drag & drop configurator</td>
+            <td><span class="badge badge-todo">Month 3–4</span></td>
+          </tr>
+          <tr>
+            <td>DocuSign Integration</td>
+            <td>E-signature + webhook + order trigger</td>
+            <td><span class="badge badge-todo">Month 5–6</span></td>
+          </tr>
+          <tr>
+            <td>Revenue Cloud Billing</td>
+            <td>Billing schedules · invoices · payments</td>
+            <td><span class="badge badge-todo">Month 5–6</span></td>
+          </tr>
+          <tr>
+            <td>Apex Unit Tests</td>
+            <td>0% coverage — required for production</td>
+            <td><span class="badge badge-todo">Month 5–6</span></td>
+          </tr>
+          <tr>
+            <td>Avalara AvaTax</td>
+            <td>TVA tax configuration</td>
+            <td><span class="badge badge-todo">Month 5–6</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div
+        style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 24px;">
+        <h3 style="font-family: 'Syne', sans-serif; font-size: 18px; margin-bottom: 20px;">Key Design Decisions</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Decision</th>
+              <th>Reason</th>
+            </tr>
+            <tr>
+              <td>Feature Min/Max over Not Equal</td>
+              <td>Not Equal evaluates per line → false positives. Min/Max enforces inside configurator scope reliably.
+              </td>
+            </tr>
+            <tr>
+              <td>Summary Variables over Not Equal in Price Rules</td>
+              <td>SVs use Count > 0 — unambiguous and reliable.</td>
+            </tr>
+            <tr>
+              <td>20% discount cap</td>
+              <td>Protects margin while distributing global discounts proportionally across all lines.</td>
+            </tr>
+            <tr>
+              <td>Custom Script over Static Resource for QCP</td>
+              <td>Newer CPQ versions require SBQQ__CustomScript__c. Static Resources produce "Assertion Failed" error.
+              </td>
+            </tr>
+            <tr>
+              <td>Before Save Flow for currency</td>
+              <td>Fires at quote creation before any product interaction. After Save would be too late.</td>
+            </tr>
+            <tr>
+              <td>Custom Metadata for country-currency mapping</td>
+              <td>Adding a new country requires one metadata record — no code, no deployment.</td>
+            </tr>
+            <tr>
+              <td>Bundled=❌ on HW-WIFI-BOOST</td>
+              <td>Bundled=✅ makes Price Rules unable to override price. Booster needs Price Rule to go to 0.</td>
+            </tr>
+            <tr>
+              <td>Hybrid CPQ + Revenue Cloud</td>
+              <td>Full RLM migration = 12+ months risk. CPQ handles quoting, Revenue Cloud handles billing
+                post-signature.</td>
+            </tr>
+            <tr>
+              <td>Reset AdditionalDiscount in QCP Pass 2</td>
+              <td>Prevents stale Price Rule values (e.g. 760%) from poisoning QCP calculation.</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NEXT STEPS ── -->
+    <div class="section" id="nextsteps">
+      <div class="section-tag">09 · Next Steps</div>
+      <h2>Roadmap & Remaining Work</h2>
+      <div class="next-steps">
+        <div class="next-card phase1">
+          <div class="next-month">Immediate — Complete Month 1–2</div>
+          <h3>CPQ Finalization</h3>
+          <ul>
+            <li>Test QCP end-to-end on live quotes</li>
+            <li>Verify Price Rules PR2/PR3/PR4</li>
+            <li>Complete Quote Template sections</li>
+            <li>Add FR/AR Translation Workbench entries</li>
+            <li>Build Approval Workflow for high discounts</li>
+            <li>Create Ramadan_Discount_Amount__c field</li>
+            <li>Configure section conditions on templates</li>
+            <li>Test Order generation with Ordered checkbox</li>
+            <li>Configure Uplift % on Contract for renewals</li>
+          </ul>
+        </div>
+        <div class="next-card phase2">
+          <div class="next-month">Month 3–4 · LWC Development</div>
+          <h3>Visual Configurator</h3>
+          <ul>
+            <li>Build LWC Visual Product Configurator</li>
+            <li>Drag & Drop product/option selection</li>
+            <li>Real-time price preview component</li>
+            <li>Integration with CPQ APIs</li>
+            <li>Bundle hierarchy visualization</li>
+            <li>Mobile-responsive configurator UI</li>
+          </ul>
+        </div>
+        <div class="next-card phase3">
+          <div class="next-month">Month 5–6 · Revenue Cloud</div>
+          <h3>Billing & Integration</h3>
+          <ul>
+            <li>DocuSign e-signature integration</li>
+            <li>Webhook → Flow → Order automation</li>
+            <li>Revenue Cloud billing schedules</li>
+            <li>Monthly invoice generation</li>
+            <li>Avalara AvaTax configuration</li>
+            <li>Apex unit test suite (target 75%+)</li>
+            <li>Pricing regression tests</li>
+            <li>Contract renewal automation</li>
+            <li>Post-signature payment collection</li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 24px;">
+        <h3 style="font-family: 'Syne', sans-serif; font-size: 18px; margin-bottom: 16px;">Optimization Opportunities
+        </h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>#</th>
+              <th>Optimization</th>
+              <th>Impact</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Move discount values to Custom Metadata</td>
+              <td>Admin-editable without deployment</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Automate Is_Ramadan__c via Scheduled Flow</td>
+              <td>Eliminates manual toggle risk</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Automate Is_Existing_Customer__c via Flow</td>
+              <td>Set true when first Contract activated</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Add Approval Process on discount threshold</td>
+              <td>Prevents unchecked max discounts</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Declare only needed QCP fields</td>
+              <td>Reduces calculation time on large quotes</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Use Evaluation Event = Load for one-time rules</td>
+              <td>Reduces re-evaluation cost</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Replace Has_Sports_Pack__c with option constraint</td>
+              <td>Eliminates manual boolean dependency</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESOURCES ── -->
+    <div class="section" id="resources">
+      <div class="section-tag">10 · Resources</div>
+      <h2>References & Documentation</h2>
+      <div class="resource-list">
+        <div class="resource-card">
+          <div class="resource-icon">🎓</div>
+          <div>
+            <h4>Trailhead — CPQ & Revenue Cloud</h4>
+            <p>CPQ and Revenue Cloud trailmix — primary reference for best practices and architecture.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">📘</div>
+          <div>
+            <h4>CPQ Developer Guide</h4>
+            <p>SBQQ__CustomScript__c · QCP API · Quote Line fields · Price Rule conditions.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">⚡</div>
+          <div>
+            <h4>Salesforce Flow Builder</h4>
+            <p>CPQ_Auto_Set_Quote_Currency · Before Save trigger · Country_Currency_Mapping__mdt.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🔧</div>
+          <div>
+            <h4>CPQ Package Settings</h4>
+            <p>Setup → Installed Packages → Salesforce CPQ → Configure · Order tab · Allow Multiple Orders.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">💻</div>
+          <div>
+            <h4>Developer Console / Workbench</h4>
+            <p>SOQL queries · Anonymous Apex · Debug logs · Data Loader for bulk imports.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">📄</div>
+          <div>
+            <h4>DocuSign for Salesforce</h4>
+            <p>E-signature integration · Webhook configuration · Flow trigger post-signature.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🧾</div>
+          <div>
+            <h4>Revenue Cloud / Salesforce Billing</h4>
+            <p>Billing schedules · Invoice generation · Payment collection · Revenue recognition.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🧪</div>
+          <div>
+            <h4>Apex Testing Guide</h4>
+            <p>Unit tests for pricing validation · Regression test suite · 75%+ coverage for production.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🌍</div>
+          <div>
+            <h4>Translation Workbench</h4>
+            <p>FR + AR entries for product names · Quote Template labels · Field translations.</p>
+          </div>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">💡</div>
+          <div>
+            <h4>LWC Developer Guide</h4>
+            <p>Lightning Web Components · CPQ API integration · Visual configurator development.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <div>
+      <div class="footer-brand">Nexa<span>Link</span></div>
+      <p style="margin-top: 6px;">CPQ + Revenue Cloud Architecture · PFE 2026</p>
+    </div>
+    <div style="text-align: right;">
+      <p>Mohammed Dadda · Inetum</p>
+      <p style="margin-top: 4px; color: #4B6A8A;">v1.0 · April 2026</p>
+    </div>
+  </div>
+
+</body>
+
+</html>

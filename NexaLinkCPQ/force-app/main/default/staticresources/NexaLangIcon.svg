@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="#00AF91" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- outer circle -->
+  <circle cx="50" cy="50" r="43"/>
+  <!-- left longitude arc -->
+  <path d="M50 7 C34 18 26 33 26 50 C26 67 34 82 50 93"/>
+  <!-- right longitude arc -->
+  <path d="M50 7 C66 18 74 33 74 50 C74 67 66 82 50 93"/>
+  <!-- center vertical meridian -->
+  <line x1="50" y1="7" x2="50" y2="93"/>
+  <!-- top latitude arc -->
+  <path d="M12 32 Q50 22 88 32"/>
+  <!-- equator -->
+  <line x1="7" y1="50" x2="93" y2="50"/>
+  <!-- bottom latitude arc -->
+  <path d="M12 68 Q50 78 88 68"/>
+</svg>

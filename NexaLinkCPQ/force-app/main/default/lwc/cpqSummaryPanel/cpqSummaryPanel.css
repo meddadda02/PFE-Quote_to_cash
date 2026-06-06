@@ -1,0 +1,339 @@
+.cpq-right {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(10, 22, 40, 0.05);
+    border-radius: 16px;
+    margin: 0;
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.cpq-panel-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #0f172a;
+    text-transform: uppercase;
+    border-bottom: 2px solid #00AF91;
+    display: inline-block;
+    padding-bottom: 4px;
+}
+
+.cpq-summary-list {
+    margin-bottom: 16px;
+}
+
+.cpq-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 13px;
+    color: #334155;
+}
+
+.cpq-summary-name {
+    flex: 1;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+}
+
+.cpq-summary-qty {
+    font-weight: 700;
+    color: #64748b;
+    margin-right: 12px;
+}
+
+.cpq-summary-price {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.cpq-summary-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 16px 0;
+}
+
+.cpq-summary-totals .cpq-summary-row {
+    font-size: 14px;
+}
+
+.cpq-subtotal {
+    color: #475569;
+}
+
+.cpq-grand-total {
+    font-size: 16px !important;
+    color: #00AF91;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 2px dashed #00AF91;
+}
+
+.cpq-discount-row {
+    color: #ef4444;
+}
+
+.cpq-discount-breakdown {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.cpq-discount-breakdown h5 {
+    color: #ef4444;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.cpq-discount-breakdown p {
+    color: #7f1d1d;
+    font-size: 12px;
+}
+
+.cpq-manual-discount-panel {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    padding: 16px;
+}
+
+.cpq-manual-discount-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.cpq-manual-discount-title {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.cpq-manual-discount-hint {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.cpq-manual-discount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.cpq-manual-discount-name {
+    font-size: 12px;
+    color: #334155;
+    flex: 1;
+}
+
+.cpq-manual-discount-input-wrap {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 2px 8px;
+}
+
+.cpq-manual-discount-input {
+    width: 60px;
+    border: none;
+    outline: none;
+    text-align: right;
+    font-size: 12px;
+}
+
+.cpq-manual-discount-symbol {
+    font-size: 11px;
+    color: #64748b;
+    margin-left: 4px;
+}
+
+.cpq-manual-discount-note {
+    font-size: 11px;
+    color: #00AF91;
+    margin-top: 12px;
+}
+
+.cpq-manual-discount-empty {
+    font-size: 12px;
+    color: #94a3b8;
+    text-align: center;
+    padding: 12px;
+}
+
+.cpq-status-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.cpq-status-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.cpq-status-panel-title {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.cpq-current-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.cpq-current-status-label {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.cpq-status-badge-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cpq-status-draft { background: #e2e8f0; color: #475569; }
+.cpq-status-inreview { background: #fef08a; color: #854d0e; }
+.cpq-status-presented { background: #bfdbfe; color: #1e3a8a; }
+.cpq-status-approved-badge { background: #dcfce7; color: #166534; }
+.cpq-status-denied, .cpq-status-rejected { background: #fee2e2; color: #991b1b; }
+.cpq-status-accepted { background: #bbf7d0; color: #14532d; }
+
+.cpq-status-save-btn {
+    width: 100%;
+    margin-top: 12px;
+    background: #00AF91;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.cpq-status-save-btn:hover {
+    background: #008a73;
+}
+
+.cpq-status-warning {
+    margin-top: 12px;
+    background: #fffbeb;
+    color: #b45309;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cpq-status-approved-banner {
+    margin-top: 12px;
+    background: #f0fdf4;
+    color: #15803d;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cpq-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.cpq-order-action-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.cpq-order-action-label {
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.cpq-btn-full-width {
+    width: 100%;
+}
+
+.cpq-order-created-badge {
+    background: #dcfce7;
+    color: #166534;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cpq-link-btn {
+    background: none;
+    border: none;
+    color: #00AF91;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+}
+
+.cpq-link-btn:hover {
+    text-decoration: underline;
+}
+
+.cpq-alert {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cpq-alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.cpq-alert-success {
+    background: #dcfce7;
+    color: #166534;
+}

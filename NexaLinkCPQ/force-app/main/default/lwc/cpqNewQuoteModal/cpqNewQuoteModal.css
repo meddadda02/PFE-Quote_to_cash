@@ -1,0 +1,299 @@
+:host {
+    --cpq-primary: #00AF91;
+    --cpq-primary-hover: #008a73;
+    --cpq-dark: #0a1628;
+    --cpq-glass: rgba(255, 255, 255, 0.95);
+    --cpq-glass-border: rgba(255, 255, 255, 0.5);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.cpq-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 22, 40, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.cpq-modal-content {
+    background: var(--cpq-glass);
+    border: 1px solid var(--cpq-glass-border);
+    border-radius: 20px;
+    box-shadow: 0 24px 64px rgba(10, 22, 40, 0.25), inset 0 1px 1px rgba(255,255,255,0.8);
+    width: 92%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.cpq-modal-medium {
+    max-width: 680px;
+}
+
+.cpq-modal-header {
+    background: linear-gradient(135deg, #0a1628 0%, #162c4f 100%);
+    color: white;
+    padding: 20px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--cpq-primary);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.cpq-modal-badge {
+    display: inline-block;
+    background: rgba(0, 175, 145, 0.2);
+    border: 1px solid rgba(0, 175, 145, 0.4);
+    color: #00AF91;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.cpq-modal-title {
+    font-size: 20px;
+    font-weight: 900;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.cpq-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.cpq-modal-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+.cpq-modal-body {
+    padding: 24px 28px;
+    overflow-y: auto;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.cpq-modal-footer {
+    padding: 18px 28px;
+    border-top: 1px solid rgba(10, 22, 40, 0.05);
+    background: rgba(248, 250, 252, 0.8);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Custom Segmented Workflow Toggle */
+.cpq-workflow-selector {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.cpq-workflow-selector input {
+    display: none;
+}
+
+.cpq-workflow-selector label {
+    padding: 10px 28px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #64748b;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+    user-select: none;
+    margin: 0;
+}
+
+.cpq-workflow-selector input:checked + label {
+    background: white;
+    color: #00AF91;
+    box-shadow: 0 4px 12px rgba(10, 22, 40, 0.06);
+    font-weight: 900;
+}
+
+/* Buttons */
+.cpq-btn-primary {
+    background: linear-gradient(135deg, var(--cpq-primary) 0%, #009b80 100%);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 175, 145, 0.25);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cpq-btn-primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 8px 24px rgba(0, 175, 145, 0.35);
+    background: linear-gradient(135deg, var(--cpq-primary-hover) 0%, #007a65 100%);
+}
+
+.cpq-btn-primary:active {
+    transform: translateY(0.5px);
+}
+
+.cpq-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cpq-btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Lookup Results */
+.cpq-lookup-results {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    max-height: 180px;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(10, 22, 40, 0.06);
+    margin-top: 4px;
+}
+
+.cpq-lookup-item {
+    padding: 12px 18px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.cpq-lookup-item:last-child {
+    border-bottom: none;
+}
+
+.cpq-lookup-item:hover {
+    background: #f0fdfa;
+}
+
+.cpq-lookup-item strong {
+    color: #0a1628;
+    font-size: 13px;
+}
+
+.cpq-lookup-item span {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.cpq-selected-badge {
+    background: #e6f7f4;
+    border: 1px solid rgba(0, 175, 145, 0.3);
+    color: #00AF91;
+    padding: 10px 16px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 13px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.cpq-selected-badge button {
+    background: none;
+    border: none;
+    color: #00AF91;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    transition: transform 0.2s;
+}
+
+.cpq-selected-badge button:hover {
+    transform: scale(1.2);
+    color: #ef4444;
+}
+
+.cpq-currency-info {
+    font-size: 12px;
+    color: #64748b;
+    text-align: right;
+    margin-top: 8px;
+}
+
+.cpq-currency-info strong {
+    color: #00AF91;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Toggle custom styles override for SLDS toggles inside LWC shadow root */
+.slds-checkbox_toggle .slds-checkbox_faux {
+    background-color: #cbd5e1 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.slds-checkbox_toggle input:checked + .slds-checkbox_faux_container .slds-checkbox_faux {
+    background-color: #00AF91 !important;
+    border-color: #00AF91 !important;
+}

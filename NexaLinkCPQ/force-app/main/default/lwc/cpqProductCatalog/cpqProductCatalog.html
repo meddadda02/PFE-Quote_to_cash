@@ -1,0 +1,73 @@
+<template>
+    <div class="cpq-left">
+        <div class="cpq-search-section">
+            <h3 class="cpq-panel-title">{lbl.leftPanelTitle}</h3>
+            <lightning-input type="search" label={lbl.searchInputLabel}
+                placeholder={lbl.searchInputPlaceholder} value={productSearchQuery}
+                onchange={handleProductSearchChange} class="cpq-search-input">
+            </lightning-input>
+            <div class="cpq-search-results">
+                <!-- PRODUCTS -->
+                <template if:true={filteredProducts.length}>
+                    <template for:each={filteredProducts} for:item="prod">
+                        <div key={prod.id} class="cpq-search-result-item" draggable="true"
+                            ondragstart={handleProductDragStart} data-id={prod.id}
+                            data-productid={prod.productId} data-name={prod.name}
+                            data-price={prod.unitPrice} data-code={prod.productCode}
+                            data-family={prod.family} data-charge={prod.chargeType}>
+                            <div class="cpq-search-result-name">{prod.name}</div>
+                            <div class="cpq-search-result-meta">
+                                <span class="cpq-search-code">{prod.productCode}</span>
+                                <span class="cpq-search-family">{prod.family}</span>
+                                <span class="cpq-search-charge">{prod.chargeType}</span>
+                            </div>
+                            <div class="cpq-search-result-footer">
+                                <span class="cpq-search-price">{prod.unitPrice} {selectedCurrency}</span>
+                                <button type="button" class="cpq-quick-add-btn" data-id={prod.id}
+                                    data-productid={prod.productId} data-name={prod.name}
+                                    data-price={prod.unitPrice} data-code={prod.productCode}
+                                    data-family={prod.family} data-charge={prod.chargeType}
+                                    onclick={handleQuickAddProduct}>
+                                    {lbl.addBtn}
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <!-- BUNDLES -->
+                <template if:true={filteredBundles.length}>
+                    <div class="cpq-search-section-label">{lbl.bundlesSectionLabel}</div>
+                    <template for:each={filteredBundles} for:item="bundle">
+                        <div key={bundle.id} class="cpq-search-result-item cpq-bundle-search-item"
+                            draggable="true" ondragstart={handleBundleDragStart} data-id={bundle.id}
+                            data-name={bundle.name}>
+                            <div class="cpq-search-result-name">
+                                <span class="cpq-bundle-badge">{lbl.bundleBadge}</span>
+                                {bundle.name}
+                            </div>
+                            <div class="cpq-search-result-meta">
+                                <span class="cpq-search-family">{bundle.description}</span>
+                            </div>
+                            <div class="cpq-search-result-footer">
+                                <span class="cpq-search-price">{bundle.basePrice} {selectedCurrency}</span>
+                                <button type="button" class="cpq-quick-add-btn cpq-bundle-add-btn"
+                                    data-id={bundle.id} data-name={bundle.name}
+                                    onclick={handleSelectBundle}>
+                                    {lbl.addBtn}
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <!-- EMPTY STATE -->
+                <template if:false={filteredProducts.length}>
+                    <template if:false={filteredBundles.length}>
+                        <div class="cpq-search-empty">
+                            <p>{lbl.noResultsMsg} "<strong>{productSearchQuery}</strong>"</p>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,104 @@
+<template>
+    <div class="cpq-center">
+        <div class="cpq-canvas-title slds-grid slds-grid_align-spread">
+            <span>{lbl.canvasTitle}</span>
+            <button type="button" class="cpq-clear-btn" onclick={handleClearCanvas}>
+                {lbl.clearCanvasBtn}
+            </button>
+        </div>
+        <div class="cpq-canvas" ondragover={handleCanvasDragOver} ondragleave={handleCanvasDragLeave} ondrop={handleCanvasDrop}>
+            <template if:true={canvasItems.length}>
+                <template for:each={canvasItems} for:item="item">
+                    <!-- PRODUCT ITEMS -->
+                    <template if:false={item.bundleProducts}>
+                        <div key={item.uid} class="cpq-canvas-item" style={item.style} data-uid={item.uid} onmousedown={handleCanvasItemMouseDown}>
+                            <div class="cpq-canvas-item-name">{item.name}</div>
+                            <div class="cpq-canvas-item-meta">
+                                <span class="cpq-canvas-code">{item.productCode}</span>
+                                <span class="cpq-canvas-family">{item.family}</span>
+                            </div>
+                            <div class="cpq-canvas-item-price">
+                                <template if:true={item.isDiscounted}>
+                                    <span class="cpq-old-price" style="text-decoration:line-through;color:#999;font-size:0.9em;">
+                                        {item.unitPrice} {selectedCurrency}</span>
+                                    <span class="cpq-net-price" style="color:#00AF91;font-weight:800;margin-left:5px;">
+                                        {item.unitNetPrice} {selectedCurrency}</span>
+                                </template>
+                                <template if:false={item.isDiscounted}>
+                                    <span class="cpq-label">Unit:</span>
+                                    {item.unitPrice} {selectedCurrency}
+                                </template>
+                            </div>
+                            <div class="cpq-canvas-item-qty">
+                                <input type="number" value={item.quantity} min="1" max="999" data-uid={item.uid} onchange={handleQuantityChange} class="cpq-qty-input" required>
+                                <span class="cpq-label">× {item.quantity}</span>
+                            </div>
+                            <div class="cpq-canvas-discount-row">
+                                <label class="cpq-canvas-discount-label">Disc. Amt</label>
+                                <div class="cpq-canvas-discount-wrap">
+                                    <input type="number" min="0" step="0.01" class="cpq-canvas-discount-input" value={item.manualDiscount} data-uid={item.uid} onchange={handleManualDiscountChange} placeholder="0.00" />
+                                    <span class="cpq-canvas-discount-symbol">{selectedCurrency}</span>
+                                </div>
+                                <template if:true={item.manualDiscount}>
+                                    <span class="cpq-canvas-discount-preview">-{item.manualDiscount}</span>
+                                </template>
+                            </div>
+                            <div class="cpq-canvas-item-total">
+                                Total: {item.lineTotal} {selectedCurrency}
+                            </div>
+                            <template if:true={item.isDiscounted}>
+                                <div class="cpq-canvas-discount-info">
+                                    <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
+                                        <span class="cpq-discount-badge">{item.discountPercent}% OFF</span>
+                                        <span style="font-size:10px;font-weight:700;color:#00AF91;">
+                                            -{item.discountAmount} {selectedCurrency}</span>
+                                    </div>
+                                    <div class="cpq-discount-detail">{item.discountReason}</div>
+                                </div>
+                            </template>
+                            <button type="button" class="cpq-canvas-item-remove" data-uid={item.uid} onclick={handleCanvasItemRemove}>×</button>
+                        </div>
+                    </template>
+                    <!-- BUNDLE ITEMS -->
+                    <template if:true={item.bundleProducts}>
+                        <div key={item.uid} class="cpq-bundle-canvas-item cpq-canvas-item-square" style={item.style} data-uid={item.uid} onmousedown={handleCanvasItemMouseDown}>
+                            <div class="cpq-bundle-canvas-header">
+                                <div class="cpq-bundle-canvas-name">{item.name}</div>
+                                <button type="button" class="cpq-bundle-canvas-remove" data-uid={item.uid} onclick={handleCanvasItemRemove}>×</button>
+                            </div>
+                            <div class="cpq-bundle-canvas-price">
+                                {item.lineTotal} {selectedCurrency}
+                            </div>
+                            <template if:true={item.discountPercent}>
+                                <div class="cpq-bundle-total-discount">
+                                    Save {item.discountPercent}%
+                                </div>
+                            </template>
+                            <div class="cpq-bundle-selected-summary">
+                                <template for:each={item.bundleProducts} for:item="bp">
+                                    <div key={bp.productCode} class="cpq-bundle-opt-row">
+                                        <span class="cpq-opt-name">{bp.name}</span>
+                                        <template if:true={bp.discountPercent}>
+                                            <span class="cpq-opt-disc-pill">-{bp.discountPercent}%</span>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="cpq-bundle-canvas-qty">
+                                <span class="cpq-qty-label">{lbl.colQty}:</span>
+                                <input type="number" value={item.quantity} min="1" max="999" data-uid={item.uid} onchange={handleQuantityChange} class="cpq-qty-input">
+                            </div>
+                            <button type="button" class="cpq-btn-modify" data-uid={item.uid} onclick={handleModifyBundle}>{lbl.modifyBtn}</button>
+                        </div>
+                    </template>
+                </template>
+            </template>
+            <template if:false={canvasItems.length}>
+                <div class="cpq-canvas-empty">
+                    <lightning-icon icon-name="utility:add" size="large"></lightning-icon>
+                    <p>{lbl.canvasEmptyMsg}</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

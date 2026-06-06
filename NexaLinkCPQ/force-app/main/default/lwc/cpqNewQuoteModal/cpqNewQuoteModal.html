@@ -1,0 +1,227 @@
+<template>
+    <div class="cpq-modal-overlay">
+        <div class="cpq-modal-content cpq-modal-medium glass-modal">
+            <div class="cpq-modal-header">
+                <div>
+                    <span class="cpq-modal-badge">{lbl.newQuoteModalBadge}</span>
+                    <h2 class="cpq-modal-title">{lbl.newQuoteModalTitle}</h2>
+                </div>
+                <button class="cpq-modal-close" onclick={handleCloseNewQuoteModal}>×</button>
+            </div>
+
+            <div class="cpq-modal-body slds-p-around_large">
+                <!-- Workflow Selection -->
+                <div class="slds-grid slds-grid_align-center slds-m-bottom_large">
+                    <div class="cpq-workflow-selector">
+                        <input type="radio" id="wf-new" name="workflow" value="New" checked={isNewWorkflow}
+                            onchange={handleWorkflowChange} />
+                        <label for="wf-new">{lbl.newCustomerTab}</label>
+                        <input type="radio" id="wf-existing" name="workflow" value="Existing"
+                            checked={isExistingWorkflow} onchange={handleWorkflowChange} />
+                        <label for="wf-existing">{lbl.existingCustomerTab}</label>
+                    </div>
+                </div>
+
+                <template if:true={isNewWorkflow}>
+                    <!-- Toggle Individual/Company -->
+                    <div class="slds-form-element slds-m-bottom_large">
+                        <label class="slds-checkbox_toggle slds-grid slds-grid_align-center">
+                            <span class="slds-form-element__label slds-m-bottom_none slds-m-right_small"
+                                style="font-weight: 800; color: #112344;">{lbl.individualLabel}</span>
+                            <input type="checkbox" name="customerTypeToggle"
+                                onchange={handleNewQuoteInputChange} aria-describedby="toggle-customer-type" />
+                            <span id="toggle-customer-type" class="slds-checkbox_faux_container"
+                                aria-live="assertive">
+                                <span class="slds-checkbox_faux"></span>
+                            </span>
+                            <span class="slds-form-element__label slds-m-bottom_none slds-m-left_small"
+                                style="font-weight: 800; color: #112344;">{lbl.companyLabel}</span>
+                        </label>
+                    </div>
+
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <!-- Conditional Fields -->
+                        <template if:true={isIndividual}>
+                            <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                                <lightning-input type="text" label={lbl.firstNameLabel} name="firstName"
+                                    required onchange={handleNewQuoteInputChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                                <lightning-input type="text" label={lbl.lastNameLabel} name="lastName" required
+                                    onchange={handleNewQuoteInputChange}></lightning-input>
+                            </div>
+                        </template>
+
+                        <template if:true={isCompany}>
+                            <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                <lightning-input type="text" label={lbl.companyNameLabel} name="companyName"
+                                    required onchange={handleNewQuoteInputChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                                <lightning-input type="text" label={lbl.contactFirstNameLabel} name="firstName"
+                                    required onchange={handleNewQuoteInputChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                                <lightning-input type="text" label={lbl.contactLastNameLabel} name="lastName"
+                                    required onchange={handleNewQuoteInputChange}></lightning-input>
+                            </div>
+                        </template>
+
+                        <!-- Common Fields -->
+                        <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                            <lightning-input type="email" label={lbl.emailLabel} name="email"
+                                onchange={handleNewQuoteInputChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                            <lightning-input type="tel" label={lbl.phoneLabel} name="phone"
+                                onchange={handleNewQuoteInputChange}></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                            <div style="border-top: 1px solid rgba(0,0,0,0.05); margin: 10px 0;"></div>
+                            <h4
+                                style="color:#00AF91; font-size:11px; font-weight:800; margin-bottom:12px; text-transform:uppercase;">
+                                {lbl.discountEligibilityTitle}</h4>
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-2 slds-m-bottom_x-small">
+                                    <lightning-input type="checkbox" label={lbl.isNewCustomerLabel}
+                                        name="isNewCustomer"
+                                        onchange={handleNewQuoteInputChange}></lightning-input>
+                                </div>
+                                <template if:true={isIndividual}>
+                                    <div class="slds-col slds-size_1-of-2 slds-m-bottom_x-small">
+                                        <lightning-input type="checkbox" label={lbl.isStudentLabel}
+                                            name="isStudent"
+                                            onchange={handleNewQuoteInputChange}></lightning-input>
+                                    </div>
+                                </template>
+                                <div class="slds-col slds-size_1-of-2 slds-m-bottom_x-small">
+                                    <lightning-input type="checkbox" label={lbl.isTelecomEmployeeLabel}
+                                        name="isTelecomEmployee"
+                                        onchange={handleNewQuoteInputChange}></lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2 slds-m-bottom_x-small">
+                                    <lightning-input type="checkbox" label={lbl.isExistingCustomerLabel}
+                                        name="isExistingCustomer"
+                                        onchange={handleNewQuoteInputChange}></lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                            <div style="border-top: 1px solid rgba(0,0,0,0.05); margin: 15px 0;"></div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                            <lightning-input type="text" label={lbl.opportunityNameLabel} name="opportunityName"
+                                required placeholder={lbl.opportunityNamePlaceholder}
+                                onchange={handleNewQuoteInputChange}></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                            <lightning-combobox label={lbl.currencyLabel} name="selectedCurrency"
+                                value={selectedCurrency} options={currencyOptions}
+                                onchange={handleNewQuoteInputChange} required></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                            <lightning-combobox label={lbl.countryLabel} name="country" value={country}
+                                options={countryOptions} onchange={handleNewQuoteInputChange}
+                                required></lightning-combobox>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:true={isExistingWorkflow}>
+                    <div class="slds-form slds-p-around_small">
+                        <lightning-input type="search" label={lbl.findAccountLabel}
+                            placeholder={lbl.findAccountPlaceholder} value={accountSearch}
+                            onchange={handleAccountSearch} class="slds-m-bottom_medium">
+                        </lightning-input>
+
+                        <template if:true={accounts.length}>
+                            <div class="cpq-lookup-results slds-m-bottom_medium">
+                                <template for:each={accounts} for:item="acc">
+                                    <div key={acc.id} class="cpq-lookup-item" data-id={acc.id}
+                                        data-name={acc.name} data-country={acc.country}
+                                        onclick={handleModalAccountSelect}>
+                                        <strong>{acc.name}</strong>
+                                        <span>{acc.country}</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template if:true={selectedAccount}>
+                            <div class="cpq-selected-badge slds-m-bottom_medium">
+                                <span>Account: <strong>{selectedAccount.name}</strong></span>
+                                <button type="button" onclick={handleClearAccount}>×</button>
+                            </div>
+
+                            <lightning-combobox label={lbl.selectOpportunityLabel} placeholder="Choose..."
+                                options={opportunityOptions} value={selectedOpportunityId}
+                                disabled={isOppDropdownDisabled} onchange={handleOpportunitySelect}
+                                class="slds-m-bottom_small">
+                            </lightning-combobox>
+
+                            <div class="slds-m-bottom_medium slds-m-top_x-small">
+                                <button type="button" class="cpq-btn-secondary"
+                                    onclick={handleToggleNewOppForm}>
+                                    {lbl.addNewOpportunityBtn}
+                                </button>
+                            </div>
+
+                            <template if:true={showNewOppForm}>
+                                <div class="cpq-new-opp-form slds-m-bottom_medium"
+                                    style="border:1px solid rgba(0,175,145,0.25);border-radius:8px;padding:16px;background:rgba(0,175,145,0.04);">
+                                    <div class="slds-grid slds-wrap slds-gutters">
+                                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                            <lightning-input type="text" label={lbl.newOppNameLabel}
+                                                name="newOppName" value={newOppName} required
+                                                onchange={handleNewOppInputChange}>
+                                            </lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                                            <lightning-input type="date" label={lbl.newOppCloseDateLabel}
+                                                name="newOppCloseDate" value={newOppCloseDate} required
+                                                onchange={handleNewOppInputChange}>
+                                            </lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2 slds-m-bottom_small">
+                                            <lightning-combobox label={lbl.currencyLabel} name="newOppCurrency"
+                                                value={newOppCurrency} options={currencyOptions}
+                                                onchange={handleNewOppInputChange}>
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="cpq-btn-primary slds-m-top_small"
+                                        onclick={handleCreateOppAndQuote} disabled={isLoading}>
+                                        <template if:true={isLoading}>
+                                            <lightning-spinner alternative-text={lbl.loadingMsg}
+                                                size="small"></lightning-spinner>
+                                        </template>
+                                        {lbl.createOppAndQuoteBtn}
+                                    </button>
+                                </div>
+                            </template>
+
+                            <div class="cpq-currency-info">
+                                <span>{lbl.usingCurrencyLabel} <strong>{selectedCurrency}</strong></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <div class="cpq-modal-footer">
+                <button class="cpq-btn-secondary slds-m-right_small"
+                    onclick={handleCloseNewQuoteModal}>{lbl.cancelBtn}</button>
+                <button class="cpq-btn-primary" onclick={handleSubmitNewQuote} disabled={isLoading}>
+                    <template if:true={isLoading}>
+                        <lightning-spinner alternative-text={lbl.loadingMsg} size="small"></lightning-spinner>
+                    </template>
+                    {lbl.generateRecordsBtn}
+                </button>
+            </div>
+        </div>
+    </div>
+</template>

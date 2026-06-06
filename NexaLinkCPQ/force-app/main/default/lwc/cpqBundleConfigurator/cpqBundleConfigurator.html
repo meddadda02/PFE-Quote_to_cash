@@ -1,0 +1,159 @@
+<template>
+    <div class="cpq-modal-overlay" onclick={handleCloseBundleModal}>
+        <div class="cpq-modal-content cpq-modal-wide" onclick={handleModalContentClick}>
+
+            <div class="cpq-modal-header">
+                <div>
+                    <span class="cpq-modal-badge">{lbl.bundleModalBadge}</span>
+                    <h2 class="cpq-modal-title">{modalBundleName}</h2>
+                </div>
+                <button class="cpq-modal-close" onclick={handleCloseBundleModal}>×</button>
+            </div>
+
+            <div class="cpq-vbanner">
+                <div class="cpq-vbanner-title">
+                    <template if:true={modalIsValid}>
+                        <span class="cpq-vbanner-globe cpq-vbanner-globe-ok">✓</span>
+                        <span class="cpq-vbanner-ready">{lbl.bundleReadyMsg}</span>
+                    </template>
+                    <template if:false={modalIsValid}>
+                        <span class="cpq-vbanner-globe cpq-vbanner-globe-err">!</span>
+                        <span class="cpq-vbanner-pending">{lbl.completeRequiredMsg}</span>
+                    </template>
+                </div>
+                <div class="cpq-vbanner-rows">
+                    <template for:each={modalBanner} for:item="row">
+                        <div key={row.featureId} class={row.statusClass}>
+                            <span class="cpq-vrow-icon">{row.statusIcon}</span>
+                            <span class="cpq-vrow-feature">{row.name}</span>
+                            <span class="cpq-vrow-rule">{row.rule}</span>
+                            <span class="cpq-vrow-status">{row.statusLabel}</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div class="cpq-modal-body">
+                <template for:each={modalFeatures} for:item="feature">
+                    <div key={feature.featureId} class="cpq-feature-block">
+                        <div class="cpq-feature-header">
+                            <div class="cpq-feature-name">{feature.name}</div>
+                            <div class="cpq-feature-rule">
+                                <template if:true={feature.isRadio}>
+                                    <span class="cpq-feature-tag cpq-tag-radio">Choose 1</span>
+                                </template>
+                                <template if:false={feature.isRadio}>
+                                    <span class="cpq-feature-tag cpq-tag-multi">
+                                        Min {feature.minOpt} — Max {feature.maxOpt}
+                                    </span>
+                                </template>
+                            </div>
+                        </div>
+                        <template if:true={feature.validationError}>
+                            <div class="cpq-feature-error">
+                                <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                                {feature.validationError}
+                            </div>
+                        </template>
+                        <div class="cpq-options-grid">
+                            <template for:each={feature.options} for:item="opt">
+                                <div key={opt.productCode} class={opt.cardClass}>
+                                    <template if:true={feature.isRadio}>
+                                        <label class="cpq-option-label">
+                                            <input type="radio" name={feature.featureId}
+                                                checked={opt.isSelected} disabled={opt.isDisabled}
+                                                data-feature-id={feature.featureId}
+                                                data-product-code={opt.productCode}
+                                                onchange={handleBundleOptionToggle} class="cpq-option-input">
+                                            <div class="cpq-option-content">
+                                                <div class="cpq-option-name">{opt.name}</div>
+                                                <div class="cpq-option-meta">
+                                                    <span class="cpq-option-code">{opt.productCode}</span>
+                                                    <span class="cpq-option-charge">{opt.chargeType}</span>
+                                                </div>
+                                                <div class="cpq-option-price-row">
+                                                    <template if:true={opt.isBundled}>
+                                                        <template if:true={opt.isFree}>
+                                                            <span
+                                                                class="cpq-tag-included">{lbl.includedTag}</span>
+                                                        </template>
+                                                        <template if:false={opt.isFree}>
+                                                            <span class="cpq-option-price">
+                                                                {opt.price} {selectedCurrency}</span>
+                                                        </template>
+                                                    </template>
+                                                    <template if:false={opt.isBundled}>
+                                                        <span class="cpq-option-price">
+                                                            {opt.price} {selectedCurrency}</span>
+                                                    </template>
+                                                    <template if:true={opt.isRequired}>
+                                                        <span class="cpq-tag-required">{lbl.requiredTag}</span>
+                                                    </template>
+                                                </div>
+                                                <template if:true={opt.isDisabled}>
+                                                    <div class="cpq-option-disabled-reason">
+                                                        {opt.disabledReason}</div>
+                                                </template>
+                                            </div>
+                                        </label>
+                                    </template>
+                                    <template if:false={feature.isRadio}>
+                                        <label class="cpq-option-label">
+                                            <input type="checkbox" checked={opt.isSelected}
+                                                disabled={opt.isDisabled} data-feature-id={feature.featureId}
+                                                data-product-code={opt.productCode}
+                                                onchange={handleBundleOptionToggle} class="cpq-option-input">
+                                            <div class="cpq-option-content">
+                                                <div class="cpq-option-name">{opt.name}</div>
+                                                <div class="cpq-option-meta">
+                                                    <span class="cpq-option-code">{opt.productCode}</span>
+                                                    <span class="cpq-option-charge">{opt.chargeType}</span>
+                                                </div>
+                                                <div class="cpq-option-price-row">
+                                                    <template if:true={opt.isBundled}>
+                                                        <template if:true={opt.isFree}>
+                                                            <span
+                                                                class="cpq-tag-included">{lbl.includedTag}</span>
+                                                        </template>
+                                                        <template if:false={opt.isFree}>
+                                                            <span class="cpq-option-price">
+                                                                {opt.price} {selectedCurrency}</span>
+                                                        </template>
+                                                    </template>
+                                                    <template if:false={opt.isBundled}>
+                                                        <span class="cpq-option-price">
+                                                            {opt.price} {selectedCurrency}</span>
+                                                    </template>
+                                                    <template if:true={opt.isRequired}>
+                                                        <span class="cpq-tag-required">{lbl.requiredTag}</span>
+                                                    </template>
+                                                </div>
+                                                <template if:true={opt.isDisabled}>
+                                                    <div class="cpq-option-disabled-reason">
+                                                        {opt.disabledReason}</div>
+                                                </template>
+                                            </div>
+                                        </label>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div class="cpq-modal-footer">
+                <div class="cpq-modal-total">
+                    {lbl.bundleTotalLabel} <strong>{modalConfigTotal} {selectedCurrency}</strong>
+                </div>
+                <div class="cpq-modal-actions">
+                    <lightning-button label={lbl.cancelBtn} onclick={handleCloseBundleModal}
+                        class="slds-m-right_small"></lightning-button>
+                    <lightning-button label={lbl.saveConfigBtn} variant="brand" onclick={handleSaveBundleConfig}
+                        disabled={isConfigInvalid}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

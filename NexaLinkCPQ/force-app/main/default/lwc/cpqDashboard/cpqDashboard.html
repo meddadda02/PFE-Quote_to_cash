@@ -1,0 +1,85 @@
+<template>
+    <div class="cpq-dashboard">
+        <div class="cpq-dashboard-header">
+            <h1>{lbl.dashboardTitle}</h1>
+            <p>{lbl.dashboardSubtitle}</p>
+        </div>
+
+        <div class="slds-grid slds-gutters_large slds-wrap">
+            <!-- SEARCH QUOTE -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <div class="cpq-dashboard-card">
+                    <div class="cpq-card-icon"><img src={searchIcon} alt="Search"></div>
+                    <h3>{lbl.searchCardTitle}</h3>
+                    <p>{lbl.searchCardSubtitle}</p>
+                    <lightning-input type="search" placeholder={lbl.searchPlaceholder} value={quoteSearchTerm}
+                        onchange={handleQuoteSearch} class="slds-m-bottom_small">
+                    </lightning-input>
+                    <template if:true={searchedQuotes.length}>
+                        <div class="cpq-result-list">
+                            <template for:each={searchedQuotes} for:item="q">
+                                <div key={q.id} class="cpq-result-item" data-id={q.id} data-name={q.name}
+                                    data-account={q.accountName} data-currency={q.currency}
+                                    onclick={handleQuoteSelect}>
+                                    <div class="cpq-item-main">
+                                        <strong>{q.name}</strong>
+                                        <span>{q.accountName}</span>
+                                    </div>
+                                    <div class="cpq-item-meta">
+                                        <span>{q.status}</span>
+                                        <span class="cpq-price-tag">{q.amount} {q.currency}</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- CREATE QUOTE -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <div class="cpq-dashboard-card cpq-create-card">
+                    <div class="cpq-card-icon"><img src={createIcon} alt="Create"></div>
+                    <h3>{lbl.createCardTitle}</h3>
+                    <p>{lbl.createCardSubtitle}</p>
+                    <button type="button" class="cpq-btn-primary slds-m-top_large"
+                        onclick={handleOpenNewQuoteModal}>
+                        {lbl.newQuoteBtn}
+                    </button>
+                </div>
+            </div>
+
+            <!-- RECENT QUOTES -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <div class="cpq-dashboard-card">
+                    <div class="cpq-card-icon"><img src={recentIcon} alt="Recent"></div>
+                    <h3>{lbl.recentCardTitle}</h3>
+                    <p>{lbl.recentCardSubtitle}</p>
+                    <div class="cpq-result-list">
+                        <template for:each={recentQuotes} for:item="q">
+                            <div key={q.id} class="cpq-result-item" data-id={q.id} data-name={q.name}
+                                data-account={q.accountName} data-currency={q.currency}
+                                onclick={handleQuoteSelect}>
+                                <div class="cpq-item-main">
+                                    <strong>{q.name}</strong>
+                                    <span>{q.accountName}</span>
+                                </div>
+                                <div class="cpq-item-meta">
+                                    <span>{q.status}</span>
+                                    <span class="cpq-price-tag">{q.amount} {q.currency}</span>
+                                </div>
+                            </div>
+                        </template>
+                        <template if:false={recentQuotes.length}>
+                            <p class="slds-text-align_center slds-p-around_medium slds-text-color_weak">
+                                {lbl.noRecentQuotes}</p>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <template if:true={errorMessage}>
+            <div class="cpq-dashboard-alert cpq-alert-error slds-m-top_large">{errorMessage}</div>
+        </template>
+    </div>
+</template>

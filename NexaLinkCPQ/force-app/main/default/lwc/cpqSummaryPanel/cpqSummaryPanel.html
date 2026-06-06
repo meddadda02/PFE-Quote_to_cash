@@ -1,0 +1,174 @@
+<template>
+    <div class="cpq-right">
+        <h3 class="cpq-panel-title">{lbl.summaryTitle}</h3>
+
+        <div class="cpq-summary-list">
+            <template for:each={canvasItems} for:item="item">
+                <div key={item.uid} class="cpq-summary-row">
+                    <span class="cpq-summary-name">{item.name}</span>
+                    <span class="cpq-summary-qty">×{item.quantity}</span>
+                    <span class="cpq-summary-price">{item.lineTotal} {selectedCurrency}</span>
+                </div>
+            </template>
+            <template if:false={canvasItems.length}>
+                <p class="slds-text-color_weak">{lbl.noItemsMsg}</p>
+            </template>
+        </div>
+
+        <div class="cpq-summary-divider"></div>
+
+        <div class="cpq-summary-totals">
+            <div class="cpq-summary-row cpq-subtotal">
+                <span>{lbl.subtotal}</span>
+                <strong>{subtotalPrice} {selectedCurrency}</strong>
+            </div>
+            <template if:true={hasDiscounts}>
+                <div class="cpq-summary-row cpq-discount-row">
+                    <span>{lbl.totalDiscount}</span>
+                    <strong class="cpq-discount-amount" style="color:#FF4F4F;">-{totalDiscountAmount} {selectedCurrency}</strong>
+                </div>
+            </template>
+            <div class="cpq-summary-row cpq-grand-total">
+                <span>{lbl.netTotal}</span>
+                <strong>{netPrice} {selectedCurrency}</strong>
+            </div>
+        </div>
+
+        <template if:true={hasDiscounts}>
+            <div class="cpq-summary-divider"></div>
+            <h4 style="color:#00AF91;font-size:11px;font-weight:800;margin-bottom:8px;">{lbl.discountDetailsLabel}</h4>
+            <div class="cpq-line-discounts slds-m-bottom_small">
+                <template for:each={canvasItems} for:item="item">
+                    <template if:true={item.discountPercent}>
+                        <div key={item.uid} class="slds-grid slds-grid_align-spread" style="font-size:11px;color:#00AF91;margin-bottom:4px;">
+                            <span>{item.name}</span>
+                            <strong>-{item.discountPercent}%</strong>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={discountBreakdown}>
+            <div class="cpq-discount-breakdown">
+                <h5>{lbl.appliedDiscountsLabel}</h5>
+                <p>{discountBreakdown}</p>
+            </div>
+        </template>
+
+        <!-- MANUAL DISCOUNT SECTION -->
+        <div class="cpq-summary-divider"></div>
+        <div class="cpq-manual-discount-panel">
+            <div class="cpq-manual-discount-header">
+                <lightning-icon icon-name="utility:currency" size="x-small" class="cpq-discount-icon"></lightning-icon>
+                <h4 class="cpq-manual-discount-title">Manual Discount Amount</h4>
+            </div>
+            <p class="cpq-manual-discount-hint">
+                Enter a discount amount in {selectedCurrency} per product. Applied before QCP calculation.
+            </p>
+            <template if:true={canvasItems.length}>
+                <div class="cpq-manual-discount-list">
+                    <template for:each={canvasItems} for:item="item">
+                        <div key={item.uid} class="cpq-manual-discount-row">
+                            <span class="cpq-manual-discount-name">{item.name}</span>
+                            <div class="cpq-manual-discount-input-wrap">
+                                <input type="number" min="0" step="0.01" class="cpq-manual-discount-input" value={item.manualDiscount} data-uid={item.uid} onchange={handleManualDiscountChange} placeholder="0.00" />
+                                <span class="cpq-manual-discount-symbol">{selectedCurrency}</span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <p class="cpq-manual-discount-note">
+                    QCP caps total discount at <strong>20%</strong> — click <strong>Calculate Discounts</strong> to apply.
+                </p>
+            </template>
+            <template if:false={canvasItems.length}>
+                <p class="cpq-manual-discount-empty">Add products to the canvas first.</p>
+            </template>
+        </div>
+
+        <!-- QUOTE STATUS CONFIGURATION -->
+        <div class="cpq-summary-divider"></div>
+        <div class="cpq-status-panel slds-m-bottom_medium">
+            <div class="cpq-status-panel-header">
+                <lightning-icon icon-name="utility:contract" size="x-small" class="cpq-status-icon"></lightning-icon>
+                <h4 class="cpq-status-panel-title">{lbl.quoteConfigTitle}</h4>
+            </div>
+            <div class="cpq-current-status-row">
+                <span class="cpq-current-status-label">{lbl.quoteStatusLabel}</span>
+                <span class={quoteStatusBadgeClass}>{quoteStatus}</span>
+            </div>
+            <lightning-combobox label={lbl.quoteStatusLabel} value={quoteStatus} options={quoteStatusOptions} onchange={handleQuoteStatusChange} class="cpq-status-combobox"></lightning-combobox>
+            <template if:true={isStatusChanged}>
+                <button type="button" class="cpq-status-save-btn" onclick={handleSaveQuoteStatus}>
+                    <lightning-icon icon-name="utility:save" size="x-small" class="cpq-status-save-icon"></lightning-icon>
+                    {lbl.saveQuoteStatusBtn}
+                </button>
+            </template>
+            <template if:true={isStatusInReview}>
+                <div class="cpq-status-warning">
+                    <lightning-icon icon-name="utility:warning" size="x-small"></lightning-icon>
+                    Quote is under review. Approval required before ordering.
+                </div>
+            </template>
+            <template if:true={isStatusApproved}>
+                <div class="cpq-status-approved-banner">
+                    <lightning-icon icon-name="utility:success" size="x-small"></lightning-icon>
+                    Quote approved. Ready to mark as ordered.
+                </div>
+            </template>
+        </div>
+
+        <!-- MAIN ACTIONS -->
+        <div class="cpq-actions">
+            <lightning-button label={lbl.addToQuoteBtn} variant="brand" onclick={handleAddToQuote} disabled={isAddToQuoteDisabled}></lightning-button>
+            <lightning-button label={lbl.calculateDiscountsBtn} variant="success" icon-name="utility:check" onclick={handleCalculateDiscounts} disabled={isCalculateDiscountsDisabled}></lightning-button>
+        </div>
+
+        <!-- MARK ORDERED -->
+        <template if:true={hasCpqLines}>
+            <div class="cpq-summary-divider"></div>
+            <div class="cpq-order-action-block">
+                <div class="cpq-order-action-label">
+                    <lightning-icon icon-name="utility:orders" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    {lbl.orderReadyLabel}
+                </div>
+                <template if:false={isOrdered}>
+                    <template if:false={isQuoteReadyToOrder}>
+                        <p style="color:#f44336; font-size:11px; font-weight:700; margin-top:8px;">
+                            <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small" variant="error"></lightning-icon>
+                            {lbl.statusWarningMsg}
+                        </p>
+                    </template>
+                    <lightning-button label={lbl.markOrderedBtn} variant="brand" icon-name="utility:check" onclick={handleMarkOrdered} disabled={isMarkOrderedDisabled} class="cpq-btn-full-width slds-m-top_small"></lightning-button>
+                </template>
+                <template if:true={isOrdered}>
+                    <div class="cpq-order-created-badge">
+                        <lightning-icon icon-name="utility:success" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        {lbl.orderCreatedPrefix} {orderNumber} {lbl.orderCreatedSuffix}
+                        <button type="button" class="cpq-link-btn" onclick={handleGoToOrderView}>{lbl.openOrderInterfaceLink}</button>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- SPINNER & ALERTS -->
+        <template if:true={isLoading}>
+            <div class="slds-grid slds-grid_align-center slds-m-top_small">
+                <lightning-spinner alternative-text={lbl.loadingMsg} size="small"></lightning-spinner>
+            </div>
+        </template>
+        <template if:true={errorMessage}>
+            <div class="cpq-alert cpq-alert-error slds-m-top_small" role="alert">
+                <lightning-icon icon-name="utility:error" size="small"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+        <template if:true={successMessage}>
+            <div class="cpq-alert cpq-alert-success slds-m-top_small" role="alert">
+                <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
+                <span>{successMessage}</span>
+            </div>
+        </template>
+    </div>
+</template>

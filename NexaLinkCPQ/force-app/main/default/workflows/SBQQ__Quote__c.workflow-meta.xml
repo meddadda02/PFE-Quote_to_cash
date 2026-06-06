@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>Notify_Manager_High_Discount</fullName>
+        <ccEmails>DADDABUSINESS00@GMAIL.COM</ccEmails>
+        <description>Notify Manager High Discount</description>
+        <protected>true</protected>
+        <recipients>
+            <recipient>meddadda10@gmail.com</recipient>
+            <type>user</type>
+        </recipients>
+        <senderType>DefaultWorkflowUser</senderType>
+        <template>unfiled$public/Approval_Request_With_Actions</template>
+    </alerts>
+    <alerts>
+        <fullName>Notify_Manager_Quote_Approved</fullName>
+        <description>Notify Manager Quote Approved</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>salesforce.adamahmedlk.09@gmail.com</recipient>
+            <type>user</type>
+        </recipients>
+        <senderType>DefaultWorkflowUser</senderType>
+        <template>unfiled$public/Quote_Approved</template>
+    </alerts>
+    <alerts>
+        <fullName>Notify_Manager_Quote_Rejected</fullName>
+        <description>Notify Manager Quote Rejected</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>salesforce.adamahmedlk.09@gmail.com</recipient>
+            <type>user</type>
+        </recipients>
+        <senderType>DefaultWorkflowUser</senderType>
+        <template>unfiled$public/Quote_Rejected</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>Reset_Discount_Approved</fullName>
+        <field>Discount_Approved__c</field>
+        <literalValue>0</literalValue>
+        <name>Reset Discount Approved</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Reset_Discount_Approved_On_Recall</fullName>
+        <field>Discount_Approved__c</field>
+        <literalValue>0</literalValue>
+        <name>Reset Discount Approved On Recall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Set_Discount_Approved</fullName>
+        <field>Discount_Approved__c</field>
+        <literalValue>1</literalValue>
+        <name>Set Discount Approved</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Set_Status_Approved</fullName>
+        <field>SBQQ__Status__c</field>
+        <literalValue>Approved</literalValue>
+        <name>Set Status Approved</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Set_Status_In_Review</fullName>
+        <field>SBQQ__Status__c</field>
+        <literalValue>In Review</literalValue>
+        <name>Set Status In Review</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Set_Status_Rejected</fullName>
+        <field>SBQQ__Status__c</field>
+        <literalValue>Rejected</literalValue>
+        <name>Set Status Rejected</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+</Workflow>

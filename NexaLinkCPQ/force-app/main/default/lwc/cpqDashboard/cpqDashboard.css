@@ -1,0 +1,203 @@
+/* ========================================================= */
+/* 🌟 ENTERPRISE PREMIUM DASHBOARD UI (GLASSMORPHISM) 🌟      */
+/* ========================================================= */
+:host {
+    --cpq-primary: #00AF91;
+    --cpq-primary-hover: #008a73;
+    --cpq-dark: #0a1628;
+    --cpq-glass: rgba(255, 255, 255, 0.85);
+    --cpq-glass-border: rgba(255, 255, 255, 0.4);
+    display: block;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e1e8ef 100%);
+    min-height: 500px;
+    padding: 32px;
+    border-radius: 16px;
+}
+
+.cpq-dashboard-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.cpq-dashboard-header h1 {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--cpq-dark);
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, #0a1628, #00AF91);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.cpq-dashboard-header p {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.cpq-dashboard-card {
+    background: var(--cpq-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--cpq-glass-border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(10, 22, 40, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cpq-dashboard-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(0, 175, 145, 0.12), 0 8px 16px rgba(0, 175, 145, 0.08);
+    border-color: rgba(0, 175, 145, 0.3);
+}
+
+.cpq-card-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(0, 175, 145, 0.1), rgba(0, 175, 145, 0.02));
+    border-radius: 50%;
+    padding: 16px;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.cpq-card-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 175, 145, 0.2));
+}
+
+.cpq-dashboard-card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.cpq-dashboard-card p {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Primary Action Button */
+.cpq-btn-primary {
+    background: linear-gradient(135deg, var(--cpq-primary) 0%, #009b80 100%);
+    color: #ffffff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 175, 145, 0.3);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+    margin-top: auto;
+}
+
+.cpq-btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 175, 145, 0.4);
+    background: linear-gradient(135deg, var(--cpq-primary-hover) 0%, #007a65 100%);
+}
+
+.cpq-btn-primary:active {
+    transform: translateY(1px);
+}
+
+/* Result Lists */
+.cpq-result-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+    text-align: left;
+}
+
+.cpq-result-item {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cpq-result-item:hover {
+    background: #ffffff;
+    border-color: var(--cpq-primary);
+    box-shadow: 0 4px 12px rgba(0, 175, 145, 0.1);
+    transform: translateX(4px);
+}
+
+.cpq-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cpq-item-main strong {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.cpq-item-main span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cpq-item-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.cpq-item-meta span:first-child {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.cpq-price-tag {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--cpq-primary);
+}
+
+.cpq-alert-error {
+    background: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #b91c1c;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+}
