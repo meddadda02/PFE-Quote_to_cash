@@ -9,14 +9,18 @@ public without sharing class CPQQuoteModel {
      */
     public static Map<String, Object> getQuoteHeader(String quoteId) {
         if (String.isBlank(quoteId)) return new Map<String, Object>();
-        SBQQ__Quote__c q = [SELECT Id, Name, SBQQ__Status__c, SBQQ__Account__r.Name, CurrencyIsoCode 
+        SBQQ__Quote__c q = [SELECT Id, Name, SBQQ__Status__c,
+                                   SBQQ__Account__c, SBQQ__Account__r.Name,
+                                   SBQQ__Opportunity2__c, CurrencyIsoCode
                             FROM SBQQ__Quote__c WHERE Id = :quoteId LIMIT 1];
         return new Map<String, Object>{
-            'id' => q.Id,
-            'name' => q.Name,
-            'status' => q.SBQQ__Status__c,
-            'accountName' => q.SBQQ__Account__r.Name,
-            'currency' => q.CurrencyIsoCode
+            'id'             => q.Id,
+            'name'           => q.Name,
+            'status'         => q.SBQQ__Status__c,
+            'accountId'      => q.SBQQ__Account__c,
+            'accountName'    => q.SBQQ__Account__r.Name,
+            'opportunityId'  => q.SBQQ__Opportunity2__c,
+            'currency'       => q.CurrencyIsoCode
         };
     }
 

@@ -124,19 +124,21 @@ public without sharing class CPQCustomerOnboardingModel {
      * @description Creates a quote for an existing customer and opportunity.
      */
     public static Map<String, String> createQuoteForExistingCustomer(String accountId, String opportunityId, String currencyCode) {
-        if (String.isBlank(accountId) || String.isBlank(opportunityId)) {
-            throw new AuraHandledException('Account and Opportunity are required');
-        }
-        Opportunity opp = [SELECT Pricebook2Id FROM Opportunity WHERE Id = :opportunityId LIMIT 1];
+        if (String.isBlank(accountId))      throw new AuraHandledException('Account ID is required to create a quote.');
+        if (String.isBlank(opportunityId))  throw new AuraHandledException('Opportunity ID is required to create a quote.');
+        if (String.isBlank(currencyCode))   currencyCode = 'MAD';
+
+        Opportunity opp = [SELECT Pricebook2Id, CurrencyIsoCode FROM Opportunity WHERE Id = :opportunityId LIMIT 1];
         Id pbId = opp.Pricebook2Id != null ? opp.Pricebook2Id : [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1].Id;
-        
+
         if (opp.Pricebook2Id == null) {
             opp.Pricebook2Id = pbId;
             update opp;
         }
 
-        // CPQ blocks setting a new primary quote when an ordered quote already exists
-        // on the opportunity. Check first to avoid FIELD_CUSTOM_VALIDATION_EXCEPTION.
+        // CPQ blocks SBQQ__Primary__c = true when there is already an ordered quote on the opportunity.
+        // For any other case (new opp, existing non-ordered quotes) always mark as Primary.
+        // CPQ will automatically uncheck the old primary when a new one is inserted.
         Integer orderedCount = [
             SELECT COUNT() FROM SBQQ__Quote__c
             WHERE SBQQ__Opportunity2__c = :opportunityId
@@ -156,7 +158,7 @@ public without sharing class CPQCustomerOnboardingModel {
         );
         insert q;
 
-        q = [SELECT Id, Name FROM SBQQ__Quote__c WHERE Id = :q.Id];
-        return new Map<String, String>{ 'id' => q.Id, 'name' => q.Name };
+        q = [SELECT Id, Name, SBQQ__Primary__c FROM SBQQ__Quote__c WHERE Id = :q.Id];
+        return new Map<String, String>{ 'id' => q.Id, 'name' => q.Name, 'isPrimary' => String.valueOf(q.SBQQ__Primary__c) };
     }
 }

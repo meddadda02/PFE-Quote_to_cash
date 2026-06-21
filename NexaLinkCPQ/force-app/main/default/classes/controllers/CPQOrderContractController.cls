@@ -6,11 +6,9 @@ public without sharing class CPQOrderContractController {
     
     @AuraEnabled
     public static Map<String, Object> markQuoteOrdered(String quoteId) {
-        try {
-            return CPQOrderContractModel.markQuoteOrdered(quoteId);
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
+        // No try-catch here — let AuraHandledException from the model propagate directly
+        // Re-wrapping with e.getMessage() can lose the original message on some exception types
+        return CPQOrderContractModel.markQuoteOrdered(quoteId);
     }
 
     @AuraEnabled

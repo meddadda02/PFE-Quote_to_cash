@@ -77,7 +77,7 @@ const LABELS = {
         calculateDiscountsBtn: 'Calculate Discounts',
         generatePDFBtn: 'Generate & Send Email',
         orderReadyLabel: 'Quote is ready to order',
-        statusWarningMsg: 'Status must be Approved, Accepted or Presented to order.',
+        statusWarningMsg: 'Quote pending approval — wait for manager to approve before ordering.',
         markOrderedBtn: 'Mark Ordered — Create Order',
         orderCreatedPrefix: 'Order',
         orderCreatedSuffix: 'created —',
@@ -190,7 +190,7 @@ const LABELS = {
         calculateDiscountsBtn: 'Calculer les remises',
         generatePDFBtn: 'Générer & Envoyer par email',
         orderReadyLabel: 'Le devis est prêt à être commandé',
-        statusWarningMsg: 'Le statut doit être Approuvé, Accepté ou Présenté pour commander.',
+        statusWarningMsg: 'Devis en attente d\'approbation — attendez l\'approbation du manager avant de commander.',
         markOrderedBtn: 'Marquer commandé — Créer une commande',
         orderCreatedPrefix: 'Commande',
         orderCreatedSuffix: 'créée —',
@@ -315,8 +315,10 @@ export default class CpqConfigurator extends LightningElement { // Définition d
     get isOrderStatusChanged() { return this.orderStatus !== this.persistedOrderStatus; }
 
     get isQuoteReadyToOrder() {
-        const allowedStatuses = ['Approved', 'Accepted', 'Presented'];
-        return allowedStatuses.includes(this.quoteStatus);
+        // Draft is allowed — Apex auto-advances to Presented before creating the order
+        // Block only quotes pending approval
+        const blockedStatuses = ['Needs Review', 'In Review'];
+        return !blockedStatuses.includes(this.quoteStatus) && this.quoteStatus !== '';
     }
 
     get isMarkOrderedDisabled() {
@@ -736,12 +738,17 @@ export default class CpqConfigurator extends LightningElement { // Définition d
         getQuoteHeader({ quoteId: this.quoteId })
             .then(header => {
                 this.quoteStatus = header.status;
-                this.isStatusChanged = false; // Reset flag for new quote
+                this.isStatusChanged = false;
                 this.selectedCurrency = header.currency;
+                // Store accountId and opportunityId so operations like "create new opp" work
+                // even when the quote was loaded from the dashboard (not from account search)
                 this.selectedAccount = {
-                    id: '', 
-                    name: header.accountName
+                    id:   header.accountId   || '',
+                    name: header.accountName || ''
                 };
+                if (header.opportunityId) {
+                    this.selectedOpportunityId = header.opportunityId;
+                }
             })
             .catch(err => console.error('Error loading quote header', err));
     }
