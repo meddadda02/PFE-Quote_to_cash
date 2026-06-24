@@ -57,33 +57,38 @@ export function onAfterCalculate(quote, lines, conn) {
         quoteId = quote.record['Id'];
     }
 
-    // Prepare the query to check if the discount has been approved
-    var quoteStatusQuery;
-    if (quoteId) {
-        quoteStatusQuery = conn.query(
-            "SELECT Discount_Approved__c, SBQQ__Status__c " +
-            "FROM SBQQ__Quote__c " +
-            "WHERE Id = '" + quoteId + "'"
-        );
-    } else {
-        quoteStatusQuery = Promise.resolve({ records: [] });
+    // Helper: runs a SOQL query safely — catches both sync errors (conn.query undefined)
+    // and async errors (query rejected) so the QCP never throws during CPQ ordering
+    function safeQuery(soql) {
+        try {
+            return conn.query(soql).then(
+                function(r) { return r || { records: [] }; },
+                function()  { return { records: [] }; }
+            );
+        } catch(e) {
+            return Promise.resolve({ records: [] });
+        }
     }
 
-    // Query to get account information
-    var accountQuery = conn.query(
-        "SELECT Is_Student__c, Is_Telecom_Employee__c, BillingCountry, " +
-        "(SELECT Id FROM Orders WHERE Status = 'Activated' LIMIT 1), " +
-        "(SELECT Id FROM Contracts WHERE Status = 'Activated' LIMIT 1) " +
-        "FROM Account WHERE Id = '" + accountId + "'"
-    );
+    var accountQuery     = safeQuery("SELECT Is_Student__c, Is_Telecom_Employee__c, BillingCountry FROM Account WHERE Id = '" + accountId + "'");
+    var orderQuery       = safeQuery("SELECT Id FROM Order WHERE AccountId = '" + accountId + "' AND Status = 'Activated' LIMIT 1");
+    var contractQuery    = safeQuery("SELECT Id FROM Contract WHERE AccountId = '" + accountId + "' AND Status = 'Activated' LIMIT 1");
+    var quoteStatusQuery = quoteId
+        ? safeQuery("SELECT Discount_Approved__c, SBQQ__Status__c FROM SBQQ__Quote__c WHERE Id = '" + quoteId + "'")
+        : Promise.resolve({ records: [] });
 
-    // Run both queries at the same time
-    return Promise.all([accountQuery, quoteStatusQuery]).then(function(results) {
+    // Run all queries at the same time — any failure returns empty records, never throws
+    return Promise.all([accountQuery, quoteStatusQuery, orderQuery, contractQuery]).then(function(results) {
 
         // --- Get data from queries ---
+        // Wrap everything in try-catch so no JS error can block CPQ ordering
 
-        var accountResult = results[0];
-        var quoteResult   = results[1] || { records: [] };
+        try {
+
+        var accountResult  = results[0] || { records: [] };
+        var quoteResult    = results[1] || { records: [] };
+        var orderResult    = results[2] || { records: [] };
+        var contractResult = results[3] || { records: [] };
 
         // Account record
         var acc = {};
@@ -97,17 +102,11 @@ export function onAfterCalculate(quote, lines, conn) {
         // Is the customer a student?
         var isStudent = acc['Is_Student__c'] || false;
 
-        // Does the account have an active contract?
-        var hasContract = false;
-        if (acc['Contracts'] && acc['Contracts'].records && acc['Contracts'].records.length > 0) {
-            hasContract = true;
-        }
-
         // Does the account have an active order?
-        var hasOrder = false;
-        if (acc['Orders'] && acc['Orders'].records && acc['Orders'].records.length > 0) {
-            hasOrder = true;
-        }
+        var hasOrder = orderResult.records && orderResult.records.length > 0;
+
+        // Does the account have an active contract?
+        var hasContract = contractResult.records && contractResult.records.length > 0;
 
         // Is the customer new (no contract and no order)?
         var isNew = !hasContract && !hasOrder;
@@ -254,11 +253,14 @@ export function onAfterCalculate(quote, lines, conn) {
             var listPrice = line.record['SBQQ__ListPrice__c']      || 0;
             var isBundled = line.record['SBQQ__Bundled__c']        || false;
 
-            // Read manual discount entered by the sales rep
-            var manualAmt = parseFloat(line.record['Manual_Discount_Amt__c'] || 0);
-            if (isNaN(manualAmt) || manualAmt < 0) {
-                manualAmt = 0;
-            }
+            // Read the standard CPQ discount % entered by the sales rep in the quote line editor
+            // SBQQ__Discount__c is always available — no field registration required
+            var cpqDiscPct = parseFloat(line.record['SBQQ__Discount__c'] || 0);
+            if (isNaN(cpqDiscPct) || cpqDiscPct < 0) { cpqDiscPct = 0; }
+
+            // Read the custom fixed-amount manual discount (requires Additional Quote Line Field registration)
+            var manualFixedPerUnit = parseFloat(line.record['Manual_Discount_Amt__c'] || 0);
+            if (isNaN(manualFixedPerUnit) || manualFixedPerUnit < 0) { manualFixedPerUnit = 0; }
 
             // Check if this product is a recurring charge
             var isRecurring = false;
@@ -278,6 +280,13 @@ export function onAfterCalculate(quote, lines, conn) {
 
             // Base price = list price * quantity
             var base = listPrice * qty;
+
+            // Convert discount inputs to total line-level amounts (needs base to be defined first)
+            var cpqDiscAmt     = parseFloat(((cpqDiscPct / 100) * base).toFixed(2));
+            var manualFixedAmt = parseFloat((manualFixedPerUnit * qty).toFixed(2));
+
+            // Combined manual discount from the sales rep (% + fixed amount)
+            var manualAmt = cpqDiscAmt + manualFixedAmt;
 
             // Bundled options are free (price = 0)
             if (isBundled) {
@@ -305,12 +314,16 @@ export function onAfterCalculate(quote, lines, conn) {
             var lineDisc  = 0;
             var breakdown = [];
 
-            // 1. Manual discount from the sales rep
+            // 1. Manual discount from the sales rep (% discount OR fixed amount)
             if (manualAmt > 0) {
-                var manualTotal     = manualAmt * qty;
-                lineDisc            = lineDisc + manualTotal;
-                totalManualDiscount = totalManualDiscount + manualTotal;
-                breakdown.push('Manual Discount: -' + manualTotal.toFixed(2) + ' ' + sym);
+                lineDisc            = lineDisc + manualAmt;
+                totalManualDiscount = totalManualDiscount + manualAmt;
+                if (cpqDiscPct > 0) {
+                    breakdown.push('Rep Discount ' + cpqDiscPct.toFixed(1) + '%: -' + cpqDiscAmt.toFixed(2) + ' ' + sym);
+                }
+                if (manualFixedAmt > 0) {
+                    breakdown.push('Manual Discount: -' + manualFixedAmt.toFixed(2) + ' ' + sym);
+                }
             }
 
             // 2. Free installation when 2 or more bundles
@@ -469,6 +482,15 @@ export function onAfterCalculate(quote, lines, conn) {
             }
         }
 
+        return Promise.resolve();
+
+        } catch(e) {
+            // Silently swallow any JS error — never block CPQ ordering
+            return Promise.resolve();
+        }
+
+    }).catch(function() {
+        // Silently swallow any query or promise error — never block CPQ ordering
         return Promise.resolve();
     });
 }

@@ -16,9 +16,10 @@ public without sharing class CPQOrderContractModel {
             throw new AuraHandledException('Only the Primary quote can be ordered. Please check the "Primary" checkbox on the Quote record first.');
         }
 
-        List<String> allowedStatuses = new List<String>{'Approved', 'Accepted', 'Presented'};
-        if (!allowedStatuses.contains(q.SBQQ__Status__c)) {
-            throw new AuraHandledException('Order cannot be created. The Quote Status must be "Approved", "Accepted", or "Presented". Current status: ' + q.SBQQ__Status__c);
+        // Block quotes that are waiting for approval
+        List<String> blockedStatuses = new List<String>{'Needs Review', 'In Review'};
+        if (blockedStatuses.contains(q.SBQQ__Status__c)) {
+            throw new AuraHandledException('This quote is pending approval (' + q.SBQQ__Status__c + '). Wait for manager approval before ordering.');
         }
 
         Integer lineCount = [SELECT count() FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c = :quoteId];
@@ -26,13 +27,22 @@ public without sharing class CPQOrderContractModel {
             throw new AuraHandledException('Cannot order a quote with no lines. Please add products first.');
         }
 
+        // Auto-advance Draft → Presented in a separate DML so CPQ sees the status BEFORE ordering
+        if (q.SBQQ__Status__c == 'Draft') {
+            q.SBQQ__Status__c = 'Presented';
+            update q;
+            q = [SELECT Id, SBQQ__Status__c, SBQQ__Ordered__c, SBQQ__Primary__c,
+                        SBQQ__Opportunity2__c, SBQQ__PricebookId__c
+                 FROM SBQQ__Quote__c WHERE Id = :quoteId LIMIT 1];
+        }
+
         q.SBQQ__Ordered__c = true;
         try {
             update q;
-        } catch (DmlException dml) {
-            String detail = dml.getNumDml() > 0 ? dml.getDmlMessage(0) : dml.getMessage();
-            throw new AuraHandledException('CPQ Order creation failed: ' + detail
-                + ' — Check that the Account has BillingCountry and the Opportunity has a Pricebook assigned.');
+        } catch (Exception ex) {
+            // Catch ALL exception types including AuraHandledException thrown by CPQ triggers
+            throw new AuraHandledException('CPQ ordering failed: ' + ex.getMessage()
+                + ' — Verify: Account has BillingCountry, Opportunity has a Pricebook, Quote has lines.');
         }
 
         List<Order> orders = [SELECT Id, OrderNumber FROM Order WHERE SBQQ__Quote__c = :quoteId ORDER BY CreatedDate DESC LIMIT 1];
