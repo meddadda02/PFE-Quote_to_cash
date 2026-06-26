@@ -1,0 +1,20 @@
+# Salesforce generated files
+.sfdx/
+.sf/
+.localdevserver/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Environment
+.env
