@@ -1,0 +1,296 @@
+<apex:page controller="CPQQuotePDFController" renderAs="pdf" showHeader="false" sidebar="false" standardStylesheets="false" applyBodyTag="false">
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 10px; color: #1a1a2e; background: #fff; }
+  .page { padding: 28px 36px 22px 36px; }
+
+  /* ── Header ─────────────────────────────────── */
+  .header { display: table; width: 100%; padding-bottom: 10px; border-bottom: 2px solid #1e4d7b; margin-bottom: 0; }
+  .header-left  { display: table-cell; vertical-align: middle; }
+  .header-right { display: table-cell; vertical-align: middle; text-align: right; }
+  .brand-name { font-size: 28px; font-weight: 900; color: #1e4d7b; letter-spacing: -0.5px; line-height: 1; }
+  .brand-sub  { font-size: 12px; color: #5a8fc0; font-weight: 700; letter-spacing: 1.5px; margin-top: 2px; }
+  .quote-num    { font-size: 18px; font-weight: bold; color: #1e4d7b; }
+  .valid-until  { font-size: 9px; color: #666; margin-top: 3px; }
+
+  /* ── Info bar ───────────────────────────────── */
+  .info-bar { background: #1e4d7b; color: #fff; padding: 6px 12px; font-size: 9px; letter-spacing: 0.4px; margin-bottom: 14px; }
+
+  /* ── Section label ──────────────────────────── */
+  .section-label { font-size: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #1e4d7b; margin-bottom: 5px; margin-top: 14px; border-bottom: 1px solid #d0dce8; padding-bottom: 3px; }
+
+  /* ── Subscription Details ───────────────────── */
+  .sub-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .sub-table td { padding: 5px 10px; font-size: 10px; border: 1px solid #d0dce8; }
+  .sub-label { font-weight: bold; color: #444; background: #f0f4f8; width: 20%; white-space: nowrap; }
+  .sub-value { color: #1a1a2e; width: 30%; }
+
+  /* ── Products table ─────────────────────────── */
+  .prod-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .prod-table th { background: #1e4d7b; color: #fff; padding: 7px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .prod-table th.r { text-align: right; }
+  .prod-table td { padding: 6px 8px; border-bottom: 1px solid #dde4ec; font-size: 10px; vertical-align: top; }
+  .prod-table tr.even td { background: #f5f8fc; }
+  .prod-table td.r { text-align: right; }
+  .total-row td { font-weight: bold; background: #dce8f5; border-top: 2px solid #1e4d7b; }
+
+  /* ── Terms ──────────────────────────────────── */
+  .terms-list { padding-left: 18px; margin-top: 4px; }
+  .terms-list li { font-size: 9px; color: #444; margin-bottom: 4px; line-height: 1.5; }
+
+  /* ── Signature section ──────────────────────── */
+  .sig-wrap { display: table; width: 100%; margin-top: 16px; border-top: 2px solid #1e4d7b; padding-top: 12px; }
+  .sig-left  { display: table-cell; width: 48%; vertical-align: top; padding-right: 20px; }
+  .sig-right { display: table-cell; width: 48%; vertical-align: top; padding-left: 20px; border-left: 1px solid #ccc; }
+  .sig-heading { font-size: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.8px; color: #1e4d7b; margin-bottom: 4px; }
+  .sig-account  { font-size: 11px; font-weight: bold; color: #222; margin-bottom: 12px; }
+  .sig-space    { height: 56px; } /* empty zone — DocuSign places sign-here tab here */
+  .sig-date-space { height: 28px; } /* empty zone — DocuSign places date tab here */
+  .field-label { border-top: 1px solid #aaa; padding-top: 2px; font-size: 8px; color: #888; margin-top: 2px; }
+  .field-gap   { margin-top: 10px; }
+
+  /* ── Footer ─────────────────────────────────── */
+  .footer { border-top: 1px solid #d0dce8; margin-top: 16px; padding-top: 7px; text-align: center; }
+  .footer-thanks { font-size: 9px; font-weight: bold; color: #1e4d7b; margin-bottom: 2px; }
+  .footer-contact { font-size: 8px; color: #888; }
+
+  /* ── DRAFT watermark ─────────────────────────── */
+  .watermark {
+    position: fixed;
+    top: 36%;
+    left: 8%;
+    font-size: 100px;
+    font-weight: 900;
+    color: #cc0000;
+    opacity: 0.06;
+    transform: rotate(-35deg);
+    white-space: nowrap;
+    letter-spacing: 8px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <apex:outputPanel rendered="{!includeCoverPage}">
+    <div style="page-break-after: always; padding: 0; margin: 0;">
+      <table border="0" cellpadding="0" cellspacing="0" style="width:100%;font-family:Arial;border-collapse:collapse;margin:0;padding:0;">
+        <tbody>
+          <tr>
+            <td style="background-color:#1F4E79;padding:80px 60px;">
+              <p style="font-size:42px;font-weight:bold;color:#ffffff;margin:0;line-height:1.1;">NexaLink</p>
+              <p style="font-size:16px;color:#A9C6DF;margin:10px 0 0;font-weight:bold;letter-spacing:1px;">Telecom</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:60px;vertical-align:top;">
+              <p style="font-size:11px;color:#888;margin:0 0 10px;text-transform:uppercase;letter-spacing:2px;font-weight:bold;">Prepared For</p>
+              <p style="font-size:34px;font-weight:bold;color:#1F4E79;margin:0 0 40px;line-height:1.2;">{!billingName}</p>
+
+              <table border="0" cellpadding="0" cellspacing="0" style="width:60%;border-collapse:collapse;">
+                <tbody>
+                  <tr>
+                    <td style="padding:8px 0;font-size:11px;color:#777;width:40%;">Quote</td>
+                    <td style="font-size:13px;font-weight:bold;color:#1a1a2e;">{!quote.Name}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 0;font-size:11px;color:#777;">Valid Until</td>
+                    <td style="font-size:13px;font-weight:bold;color:#C55A11;">
+                      <apex:outputText value="{0,date,dd/MM/yyyy}"><apex:param value="{!quote.SBQQ__ExpirationDate__c}"/></apex:outputText>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 0;font-size:11px;color:#777;">Currency</td>
+                    <td style="font-size:13px;color:#1a1a2e;">{!currencyName}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 0;font-size:11px;color:#777;">Account Manager</td>
+                    <td style="font-size:13px;color:#1a1a2e;">{!salesRepName}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#1F4E79;padding:16px 60px;">
+              <p style="font-size:11px;color:#A9C6DF;margin:0;">Confidential &nbsp;&middot;&nbsp; {!billingName} &nbsp;&middot;&nbsp; 0771339224</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </apex:outputPanel>
+
+  <div class="page">
+
+  <!-- DRAFT watermark (shown only when status is Draft) -->
+  <apex:outputPanel rendered="{!isDraft}">
+    <div class="watermark">DRAFT</div>
+  </apex:outputPanel>
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand-name">NexaLink</div>
+      <div class="brand-sub">Telecom</div>
+    </div>
+    <div class="header-right">
+      <div class="quote-num">{!quote.Name}</div>
+      <div class="valid-until">
+        <apex:outputPanel rendered="{!hasExpirationDate}">
+          Valid until&nbsp;<apex:outputText value="{0,date,dd/MM/yyyy}"><apex:param value="{!quote.SBQQ__ExpirationDate__c}"/></apex:outputText>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!!hasExpirationDate}">
+          <apex:outputText value="{0,date,dd/MM/yyyy}"><apex:param value="{!TODAY()}"/></apex:outputText>
+        </apex:outputPanel>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ INFO BAR ═════════════════════════════════════════════════════════ -->
+  <div class="info-bar">
+    TelecomQCP &middot; Quote {!quote.Name}
+    <apex:outputPanel rendered="{!hasExpirationDate}">
+      &nbsp;|&nbsp; Valid until&nbsp;<apex:outputText value="{0,date,dd/MM/yyyy}"><apex:param value="{!quote.SBQQ__ExpirationDate__c}"/></apex:outputText>
+    </apex:outputPanel>
+    &nbsp;|&nbsp; {!currencyName}
+  </div>
+
+  <!-- ═══ SUBSCRIPTION DETAILS ═════════════════════════════════════════════ -->
+  <div class="section-label">Subscription Details</div>
+  <table class="sub-table">
+    <tr>
+      <td class="sub-label">Term</td>
+      <td class="sub-value">{!subscriptionTermStr}</td>
+      <td class="sub-label">Start Date</td>
+      <td class="sub-value">
+        <apex:outputPanel rendered="{!hasStartDate}"><apex:outputText value="{0,date,dd/MM/yyyy}"><apex:param value="{!quote.SBQQ__StartDate__c}"/></apex:outputText></apex:outputPanel>
+        <apex:outputPanel rendered="{!!hasStartDate}">&mdash;</apex:outputPanel>
+      </td>
+    </tr>
+    <tr>
+      <td class="sub-label">End Date</td>
+      <td class="sub-value">
+        <apex:outputPanel rendered="{!hasEndDate}"><apex:outputText value="{0,date,dd/MM/yyyy}"><apex:param value="{!quote.SBQQ__EndDate__c}"/></apex:outputText></apex:outputPanel>
+        <apex:outputPanel rendered="{!!hasEndDate}">&mdash;</apex:outputPanel>
+      </td>
+      <td class="sub-label">Currency</td>
+      <td class="sub-value">{!currencyName}</td>
+    </tr>
+    <tr>
+      <td class="sub-label">Billing Frequency</td>
+      <td class="sub-value">
+        <apex:outputPanel rendered="{!hasBillingFrequency}">{!quote.SBQQ__BillingFrequency__c}</apex:outputPanel>
+        <apex:outputPanel rendered="{!!hasBillingFrequency}">&mdash;</apex:outputPanel>
+      </td>
+      <td class="sub-label"></td>
+      <td class="sub-value"></td>
+    </tr>
+  </table>
+
+  <!-- ═══ PRODUCTS ═════════════════════════════════════════════════════════ -->
+  <div class="section-label">Products</div>
+  <table class="prod-table">
+    <thead>
+      <tr>
+        <th style="width:7%">QTY</th>
+        <th>PRODUCT</th>
+        <th class="r" style="width:16%">UNIT PRICE</th>
+        <th class="r" style="width:11%">DISCOUNT</th>
+        <th class="r" style="width:18%">CUSTOMER TOTAL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <apex:repeat value="{!lines}" var="line">
+        <tr>
+          <td><apex:outputText value="{0,number,#,##0.##}"><apex:param value="{!line.SBQQ__Quantity__c}"/></apex:outputText></td>
+          <td>{!line.SBQQ__ProductName__c}</td>
+          <td class="r">{!quote.CurrencyIsoCode}&nbsp;<apex:outputText value="{0,number,#,##0.00}"><apex:param value="{!line.SBQQ__ListPrice__c}"/></apex:outputText></td>
+          <td class="r"><apex:outputText value="{0,number,#,##0.##}"><apex:param value="{!IF(ISNULL(line.SBQQ__Discount__c),0,line.SBQQ__Discount__c)}"/></apex:outputText>%</td>
+          <td class="r">{!quote.CurrencyIsoCode}&nbsp;<apex:outputText value="{0,number,#,##0.00}"><apex:param value="{!line.SBQQ__NetPrice__c}"/></apex:outputText></td>
+        </tr>
+      </apex:repeat>
+    </tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="4" class="r">TOTAL</td>
+        <td class="r">{!quote.CurrencyIsoCode}&nbsp;<apex:outputText value="{0,number,#,##0.00}"><apex:param value="{!totalNet}"/></apex:outputText></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- ═══ TERMS AND CONDITIONS ═════════════════════════════════════════════ -->
+  <div class="section-label">Terms and Conditions</div>
+  <ol class="terms-list">
+    <li>Invoices are due within 30 days of the billing date. Late payments will incur a 1.5% monthly interest charge.</li>
+    <li>Subscriptions automatically renew at the end of each term unless cancelled with 30 days written notice.</li>
+    <li>Hardware and equipment may be returned within 14 days of delivery if in original condition.</li>
+    <li>All prices are in Moroccan currency (MAD) and are subject to applicable taxes.</li>
+    <li>This agreement is governed by Moroccan commercial law and any disputes shall be resolved through Casablanca commercial courts.</li>
+    <li>Telecom collects and processes customer data in accordance with Moroccan data protection regulations.</li>
+  </ol>
+
+  <!-- ═══ SIGNATURE SECTION ════════════════════════════════════════════════ -->
+  <!--
+    DocuSign anchor tags (n1, s1, d1) are embedded as invisible 1px white
+    text inside the BLANK spaces above each field label.  DocuSign finds the anchor
+    text, places its tab in that blank area, and — after the customer signs — the
+    sign-here button is replaced by the actual signature/date with no overlap.
+    The label lines (Signature / Date / Title) serve as captions below the fields,
+    not as placeholders that compete with DocuSign's rendering.
+  -->
+  <div class="sig-wrap">
+
+    <!-- Customer column -->
+    <div class="sig-left">
+      <div class="sig-heading">Customer Acceptance</div>
+      <div class="sig-account">{!quote.SBQQ__Account__r.Name}</div>
+
+      <!-- Empty zone: DocuSign places FullName tab here (\n1\) -->
+      <div style="height:22px;">
+        <span style="color:white;font-size:1px;line-height:1px;">\n1\</span>
+      </div>
+      <!-- Empty zone: DocuSign places SignHere tab here (\s1\) -->
+      <div class="sig-space">
+        <span style="color:white;font-size:1px;line-height:1px;">\s1\</span>
+      </div>
+      <div class="field-label">Signature</div>
+
+      <!-- Empty zone: DocuSign places DateSigned tab here (\d1\) -->
+      <div class="sig-date-space field-gap">
+        <span style="color:white;font-size:1px;line-height:1px;">\d1\</span>
+      </div>
+      <div class="field-label">Date</div>
+
+      <div class="sig-date-space field-gap"></div>
+      <div class="field-label">Title</div>
+    </div>
+
+    <!-- NexaLink / TelecomQCP column (no DocuSign tabs — rep signs manually) -->
+    <div class="sig-right">
+      <div class="sig-heading">Telecom Authorization</div>
+      <div class="sig-account">&nbsp;</div>
+
+      <div style="height:22px;"></div>
+      <div class="sig-space"></div>
+      <div class="field-label">Signature</div>
+
+      <div class="sig-date-space field-gap"></div>
+      <div class="field-label">Date</div>
+
+      <div class="sig-date-space field-gap"></div>
+      <div class="field-label">Title</div>
+    </div>
+
+  </div>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
+  <div class="footer">
+    <div class="footer-thanks">Thank you for choosing TelecomQCP.</div>
+    <div class="footer-contact">commercial@nexalink.ma &nbsp;|&nbsp; 0771339224</div>
+  </div>
+
+</div>
+</body>
+</apex:page>

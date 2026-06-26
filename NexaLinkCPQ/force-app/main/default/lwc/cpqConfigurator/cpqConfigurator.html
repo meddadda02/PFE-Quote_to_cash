@@ -405,6 +405,44 @@
             <lightning-button label={lbl.calculateDiscountsBtn} variant="success" icon-name="utility:check" onclick={handleCalculateDiscounts} disabled={isCalculateDiscountsDisabled}></lightning-button>
         </div>
 
+        <!-- GENERATE DOCUMENT — visible once the quote has lines -->
+        <template if:true={hasCpqLines}>
+            <div class="cpq-summary-divider"></div>
+            <div class="cpq-order-action-block">
+                <div class="cpq-order-action-label">
+                    <lightning-icon icon-name="utility:file" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    {lbl.generateDocumentLabel}
+                </div>
+                <lightning-button
+                    label={lbl.generateDocumentBtn}
+                    variant="neutral"
+                    icon-name="utility:download"
+                    onclick={handleGenerateDocument}
+                    disabled={isLoading}
+                    class="cpq-btn-full-width slds-m-top_small">
+                </lightning-button>
+            </div>
+        </template>
+
+        <!-- SEND FOR SIGNATURE — visible only after document has been generated -->
+        <template if:true={hasGeneratedDoc}>
+            <div class="cpq-summary-divider"></div>
+            <div class="cpq-order-action-block">
+                <div class="cpq-order-action-label">
+                    <lightning-icon icon-name="utility:signature" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    {lbl.sendForSignatureLabel}
+                </div>
+                <lightning-button
+                    label={lbl.sendForSignatureBtn}
+                    variant="brand-outline"
+                    icon-name="utility:send"
+                    onclick={handleSendForSignature}
+                    disabled={isLoading}
+                    class="cpq-btn-full-width slds-m-top_small">
+                </lightning-button>
+            </div>
+        </template>
+
         <!-- MARK ORDERED -->
         <template if:true={hasCpqLines}>
             <div class="cpq-summary-divider"></div>

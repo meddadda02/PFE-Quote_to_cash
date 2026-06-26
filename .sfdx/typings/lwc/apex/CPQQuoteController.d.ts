@@ -10,6 +10,12 @@ declare module "@salesforce/apex/CPQQuoteController.createOpportunityForAccount"
 declare module "@salesforce/apex/CPQQuoteController.getNexaLinkTemplateId" {
   export default function getNexaLinkTemplateId(): Promise<any>;
 }
+declare module "@salesforce/apex/CPQQuoteController.generateDocument" {
+  export default function generateDocument(param: {quoteId: any}): Promise<any>;
+}
 declare module "@salesforce/apex/CPQQuoteController.generateAndSendEmail" {
   export default function generateAndSendEmail(param: {quoteId: any}): Promise<any>;
+}
+declare module "@salesforce/apex/CPQQuoteController.generateAndSendForSignature" {
+  export default function generateAndSendForSignature(param: {quoteId: any}): Promise<any>;
 }
