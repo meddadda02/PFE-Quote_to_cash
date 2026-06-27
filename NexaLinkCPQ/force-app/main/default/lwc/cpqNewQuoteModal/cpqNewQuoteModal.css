@@ -176,6 +176,21 @@
     transform: translateY(0.5px);
 }
 
+.cpq-inline-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: cpq-spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes cpq-spin {
+    to { transform: rotate(360deg); }
+}
+
 .cpq-btn-secondary {
     background: #f1f5f9;
     color: #475569;

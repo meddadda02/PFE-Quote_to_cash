@@ -196,8 +196,7 @@
                                     <button type="button" class="cpq-btn-primary slds-m-top_small"
                                         onclick={handleCreateOppAndQuote} disabled={isLoading}>
                                         <template if:true={isLoading}>
-                                            <lightning-spinner alternative-text={lbl.loadingMsg}
-                                                size="small"></lightning-spinner>
+                                            <span class="cpq-inline-spinner"></span>
                                         </template>
                                         {lbl.createOppAndQuoteBtn}
                                     </button>
@@ -217,7 +216,7 @@
                     onclick={handleCloseNewQuoteModal}>{lbl.cancelBtn}</button>
                 <button class="cpq-btn-primary" onclick={handleSubmitNewQuote} disabled={isLoading}>
                     <template if:true={isLoading}>
-                        <lightning-spinner alternative-text={lbl.loadingMsg} size="small"></lightning-spinner>
+                        <span class="cpq-inline-spinner"></span>
                     </template>
                     {lbl.generateRecordsBtn}
                 </button>

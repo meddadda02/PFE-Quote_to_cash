@@ -197,7 +197,7 @@
         <th style="width:7%">QTY</th>
         <th>PRODUCT</th>
         <th class="r" style="width:16%">UNIT PRICE</th>
-        <th class="r" style="width:11%">DISCOUNT</th>
+        <th class="r" style="width:22%">DISCOUNT BREAKDOWN</th>
         <th class="r" style="width:18%">CUSTOMER TOTAL</th>
       </tr>
     </thead>
@@ -207,7 +207,7 @@
           <td><apex:outputText value="{0,number,#,##0.##}"><apex:param value="{!line.SBQQ__Quantity__c}"/></apex:outputText></td>
           <td>{!line.SBQQ__ProductName__c}</td>
           <td class="r">{!quote.CurrencyIsoCode}&nbsp;<apex:outputText value="{0,number,#,##0.00}"><apex:param value="{!line.SBQQ__ListPrice__c}"/></apex:outputText></td>
-          <td class="r"><apex:outputText value="{0,number,#,##0.##}"><apex:param value="{!IF(ISNULL(line.SBQQ__Discount__c),0,line.SBQQ__Discount__c)}"/></apex:outputText>%</td>
+          <td style="font-size:9px; color:#444;">{!IF(ISNULL(line.Discount_Breakdown__c), 'No Discount', line.Discount_Breakdown__c)}</td>
           <td class="r">{!quote.CurrencyIsoCode}&nbsp;<apex:outputText value="{0,number,#,##0.00}"><apex:param value="{!line.SBQQ__NetPrice__c}"/></apex:outputText></td>
         </tr>
       </apex:repeat>

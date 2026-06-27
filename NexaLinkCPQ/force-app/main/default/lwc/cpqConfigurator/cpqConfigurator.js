@@ -1477,7 +1477,17 @@ export default class CpqConfigurator extends LightningElement { // Définition d
     }
 
     _handleError(title, error) { // Gère et affiche les erreurs
-        const msg = (error && (error.body && error.body.message || error.message)) || String(error);
+        let msg;
+        if (typeof error === 'string') {
+            msg = error;
+        } else if (error) {
+            msg = (error.body && error.body.message)
+               || (error.body && error.body.output && error.body.output.errors && error.body.output.errors[0] && error.body.output.errors[0].message)
+               || error.message
+               || JSON.stringify(error);
+        } else {
+            msg = 'Unknown error';
+        }
         this.errorMessage = `${title}: ${msg}`;
         this.successMessage = ''; // Clear success message on error
         this.isLoading = false;

@@ -39,7 +39,8 @@ public without sharing class CPQQuotePDFController {
 
         lines = [
             SELECT SBQQ__ProductName__c, SBQQ__Quantity__c,
-                   SBQQ__ListPrice__c, SBQQ__Discount__c, SBQQ__NetPrice__c
+                   SBQQ__ListPrice__c, SBQQ__Discount__c, SBQQ__NetPrice__c,
+                   Discount_Breakdown__c
             FROM SBQQ__QuoteLine__c
             WHERE SBQQ__Quote__c = :quoteId
             ORDER BY CreatedDate ASC
