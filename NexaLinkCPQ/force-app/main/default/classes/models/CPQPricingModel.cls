@@ -9,12 +9,23 @@ public without sharing class CPQPricingModel {
     // CLEAR + SYNC (bundles + standalones in one shot)
     // ─────────────────────────────────────────────────────────────────────────
     public static Map<String,Object> clearAndAddAllBundles(String quoteId, String bundlesJson, String standaloneJson) {
-        if (String.isNotBlank(quoteId))
-            delete [SELECT Id FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c = :quoteId];
-        List<Object> merged = new List<Object>();
-        if (String.isNotBlank(bundlesJson))    merged.addAll((List<Object>) JSON.deserializeUntyped(bundlesJson));
-        if (String.isNotBlank(standaloneJson)) merged.addAll((List<Object>) JSON.deserializeUntyped(standaloneJson));
-        return syncProductsToQuote(quoteId, JSON.serialize(merged));
+        try {
+            if (String.isNotBlank(quoteId)) {
+                // Committed delete before the savepoint lets CPQ's after-delete trigger
+                // settle the quote state so the subsequent insert does not trigger the
+                // "Changing currency on quotes with line items" validation rule.
+                delete [SELECT Id FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c = :quoteId];
+            }
+            List<Object> merged = new List<Object>();
+            if (String.isNotBlank(bundlesJson))    merged.addAll((List<Object>) JSON.deserializeUntyped(bundlesJson));
+            if (String.isNotBlank(standaloneJson)) merged.addAll((List<Object>) JSON.deserializeUntyped(standaloneJson));
+            return syncProductsToQuote(quoteId, JSON.serialize(merged));
+        } catch (Exception e) {
+            return new Map<String,Object>{
+                'success' => false,
+                'error'   => e.getMessage() + ' | line: ' + e.getLineNumber()
+            };
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -24,6 +35,9 @@ public without sharing class CPQPricingModel {
         Savepoint sp = Database.setSavepoint();
         try {
             if (String.isBlank(quoteId)) throw new AuraHandledException('Quote ID is null');
+
+            // Second delete inside the savepoint: no-op when clearAndAddAllBundles
+            // already deleted lines, but acts as safety net for direct callers.
             delete [SELECT Id FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c = :quoteId];
 
             SBQQ__Quote__c q = [SELECT Id, CurrencyIsoCode, SBQQ__PricebookId__c,
@@ -99,8 +113,7 @@ public without sharing class CPQPricingModel {
                     SBQQ__StartDate__c        = startDate,
                     SBQQ__EndDate__c          = startDate.addMonths(subTerm),
                     SBQQ__SubscriptionTerm__c = subTerm,
-                    Manual_Discount_Amt__c    = manAmt > 0 ? manAmt : null,
-                    CurrencyIsoCode           = q.CurrencyIsoCode
+                    Manual_Discount_Amt__c    = manAmt > 0 ? manAmt : null
                 ));
                 metas.add(item);
             }
@@ -140,14 +153,17 @@ public without sharing class CPQPricingModel {
                             SBQQ__OptionLevel__c      = 1,
                             SBQQ__PricingMethod__c    = 'List',
                             SBQQ__Bundled__c          = isBundledVal,
-                            SBQQ__Number__c           = globalNum++,
-                            CurrencyIsoCode           = q.CurrencyIsoCode
+                            SBQQ__Number__c           = globalNum++
                         ));
                     }
                 }
             }
             update parents;
             if (!children.isEmpty()) insert children;
+
+            try {
+                update new SBQQ__Quote__c(Id = quoteId, SBQQ__Primary__c = true);
+            } catch (Exception ex) { }
 
             return calculatePricing(quoteId);
         } catch (Exception e) {
@@ -167,6 +183,7 @@ public without sharing class CPQPricingModel {
         if (String.isBlank(quoteId))
             return new Map<String,Object>{'success' => false, 'error' => 'Quote ID null'};
         try {
+            // Step 1 — Try CPQ's own engine (handles subscription terms, etc.)
             try {
                 String qJson = SBQQ.ServiceRouter.read('SBQQ.QuoteAPI.QuoteReader', quoteId);
                 if (String.isNotBlank(qJson)) {
@@ -175,17 +192,17 @@ public without sharing class CPQPricingModel {
                 }
             } catch (Exception cpqe) {
                 System.debug('CPQ API skip: ' + cpqe.getMessage());
-                try {
-                    runFallbackCalculation(quoteId);
-                } catch (Exception fe) {
-                    System.debug('Fallback calculation failed: ' + fe.getMessage());
-                }
             }
 
-            // After CPQ calculation, apply the approved override if needed.
-            // This is the safety net: if CPQ still re-applies the cap on save,
-            // this method overwrites the net price with the correct approved amount.
-            applyApprovedDiscountOverride(quoteId);
+            // Step 2 — Always run our custom calculation so that:
+            //   • global promotional discounts are capped at 20% of list price
+            //   • manager-approved manual discounts are fully applied beyond the cap
+            //   • a consistent Discount_Breakdown__c is written for every line
+            try {
+                runFallbackCalculation(quoteId);
+            } catch (Exception fe) {
+                System.debug('Fallback calculation failed: ' + fe.getMessage());
+            }
 
             Decimal sub = 0, net = 0;
             List<Map<String,Object>> linesResult = new List<Map<String,Object>>();
@@ -195,21 +212,9 @@ public without sharing class CPQPricingModel {
             result.put('discountApproved', quote.Discount_Approved__c);
             result.put('highDiscountApproval', quote.High_Discount_Approval__c);
 
-            // Build approvedNetPriceMap so the LWC receives the correct price
-            // immediately (without waiting for another DB round-trip)
+            // approvedNetPriceMap — read the net prices already written by runFallbackCalculation
+            // so the LWC displays the same value as the DB without recomputing here.
             Map<Id, Decimal> approvedNetPriceMap = new Map<Id, Decimal>();
-            if (quote.Discount_Approved__c == true) {
-                for (SBQQ__QuoteLine__c ln : [
-                    SELECT Id, SBQQ__ListPrice__c, Manual_Discount_Amt__c
-                    FROM SBQQ__QuoteLine__c
-                    WHERE SBQQ__Quote__c = :quoteId
-                      AND Manual_Discount_Amt__c != null
-                      AND Manual_Discount_Amt__c > 0
-                ]) {
-                    Decimal lp = ln.SBQQ__ListPrice__c != null ? ln.SBQQ__ListPrice__c : 0;
-                    approvedNetPriceMap.put(ln.Id, Math.max(lp - ln.Manual_Discount_Amt__c, 0));
-                }
-            }
 
             List<SBQQ__QuoteLine__c> allLines = [
                 SELECT Id, SBQQ__Product__c, SBQQ__ProductCode__c,
@@ -376,26 +381,23 @@ public without sharing class CPQPricingModel {
     // ─────────────────────────────────────────────────────────────────────────
     public static void calculatePricingInvocable(List<Id> quoteIds) {
         for (Id quoteId : quoteIds) {
+            // Step 1 — CPQ engine (optional; errors are swallowed silently)
             try {
-                // Step 1 — Run CPQ standard calculation (QCP fires here).
-                // The updated QCP queries Discount_Approved__c via conn.query
-                // and skips the 20% cap when the discount is approved.
                 String qJson = SBQQ.ServiceRouter.read('SBQQ.QuoteAPI.QuoteReader', quoteId);
                 if (String.isNotBlank(qJson)) {
                     String cJson = SBQQ.ServiceRouter.load('SBQQ.QuoteAPI.QuoteCalculator', quoteId, qJson);
                     if (String.isNotBlank(cJson)) SBQQ.ServiceRouter.save('SBQQ.QuoteAPI.QuoteSaver', cJson);
                 }
-                // Step 2 — Safety net: if CPQ's save re-applied the cap,
-                // this override writes the correct approved net price directly.
-                applyApprovedDiscountOverride(quoteId);
             } catch (Exception e) {
-                System.debug('calculatePricingInvocable error for Quote '
-                    + quoteId + ': ' + e.getMessage());
-                try {
-                    runFallbackCalculation(quoteId);
-                } catch (Exception fe) {
-                    System.debug('Fallback calculation failed: ' + fe.getMessage());
-                }
+                System.debug('calculatePricingInvocable CPQ skip: ' + e.getMessage());
+            }
+            // Step 2 — Always run our calculation:
+            //   • global discounts capped at 20% of list price
+            //   • manager-approved manual discounts applied beyond the cap
+            try {
+                runFallbackCalculation(quoteId);
+            } catch (Exception fe) {
+                System.debug('calculatePricingInvocable fallback failed: ' + fe.getMessage());
             }
         }
     }
@@ -816,12 +818,23 @@ public without sharing class CPQPricingModel {
                 lineShare = (ld.net / totalNet) * globalDiscount;
             }
             
-            if (!ld.isExempt && ld.base > 0 && !isDiscountApproved) {
-                Decimal maxTotal = ld.base * 0.20;
-                if (ld.lineDisc + lineShare > maxTotal) {
-                    Decimal allowed = Math.max(maxTotal - ld.lineDisc, 0);
-                    breakdown.add('Global capped at 20%: was -' + lineShare.setScale(2) + ' ' + sym + ', allowed -' + allowed.setScale(2) + ' ' + sym);
-                    lineShare = allowed;
+            if (!ld.isExempt && ld.base > 0) {
+                if (!isDiscountApproved) {
+                    // Without approval: total (manual + global) must not exceed 20% of list price
+                    Decimal maxTotal = ld.base * 0.20;
+                    if (ld.lineDisc + lineShare > maxTotal) {
+                        Decimal allowed = Math.max(maxTotal - ld.lineDisc, 0);
+                        breakdown.add('Global capped at 20%: was -' + lineShare.setScale(2) + ' ' + sym + ', allowed -' + allowed.setScale(2) + ' ' + sym);
+                        lineShare = allowed;
+                    }
+                } else {
+                    // With manager approval: manual discount is uncapped (approved by manager).
+                    // Global promotional discount is still always capped at 20% of list price.
+                    Decimal maxGlobal = ld.base * 0.20;
+                    if (lineShare > maxGlobal) {
+                        breakdown.add('Global capped at 20%: was -' + lineShare.setScale(2) + ' ' + sym + ', max -' + maxGlobal.setScale(2) + ' ' + sym);
+                        lineShare = maxGlobal;
+                    }
                 }
             }
             

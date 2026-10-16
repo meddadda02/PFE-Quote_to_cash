@@ -25,6 +25,8 @@ import createNewCustomerQuote from '@salesforce/apex/CPQCustomerOnboardingContro
 import getNexaLinkTemplateId from '@salesforce/apex/CPQQuoteController.getNexaLinkTemplateId';
 import createOpportunityForAccount from '@salesforce/apex/CPQQuoteController.createOpportunityForAccount';
 import generateAndSendEmail from '@salesforce/apex/CPQQuoteController.generateAndSendEmail';
+import generateDocument from '@salesforce/apex/CPQQuoteController.generateDocument';
+import generateAndSendForSignature from '@salesforce/apex/CPQQuoteController.generateAndSendForSignature';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'; // Importation de l'utilitaire pour afficher des notifications (toasts)
 import NEXA_CREATE_ICON from '@salesforce/resourceUrl/NexaCreateIcon';
@@ -144,7 +146,12 @@ const LABELS = {
         addNewOpportunityBtn: '+ New Opportunity',
         newOppNameLabel: 'Opportunity Name',
         newOppCloseDateLabel: 'Close Date',
-        createOppAndQuoteBtn: 'Create Opportunity & Quote'
+        createOppAndQuoteBtn: 'Create Opportunity & Quote',
+        generateDocumentLabel: 'Generate Quote Document',
+        generateDocumentBtn: 'Generate Document',
+        sendForSignatureLabel: 'Send for Signature via DocuSign',
+        sendForSignatureBtn: 'Send for Signature',
+        sendForSignatureHint: 'Generate the document first, then send it to the client for signature.'
     },
     fr: {
         dashboardTitle: 'Configurateur CPQ NexaLink',
@@ -257,7 +264,12 @@ const LABELS = {
         addNewOpportunityBtn: '+ Nouvelle Opportunité',
         newOppNameLabel: "Nom de l'Opportunité",
         newOppCloseDateLabel: 'Date de Clôture',
-        createOppAndQuoteBtn: 'Créer Opportunité & Devis'
+        createOppAndQuoteBtn: 'Créer Opportunité & Devis',
+        generateDocumentLabel: 'Générer le document du devis',
+        generateDocumentBtn: 'Générer le document',
+        sendForSignatureLabel: 'Envoyer pour signature via DocuSign',
+        sendForSignatureBtn: 'Envoyer pour signature',
+        sendForSignatureHint: 'Générez d\'abord le document, puis envoyez-le au client pour signature.'
     }
 };
 
@@ -319,6 +331,10 @@ export default class CpqConfigurator extends LightningElement { // Définition d
         // Block only quotes pending approval
         const blockedStatuses = ['Needs Review', 'In Review'];
         return !blockedStatuses.includes(this.quoteStatus) && this.quoteStatus !== '';
+    }
+
+    get isQuotePresented() {
+        return this.quoteStatus === 'Presented';
     }
 
     get isMarkOrderedDisabled() {
@@ -494,6 +510,7 @@ export default class CpqConfigurator extends LightningElement { // Définition d
     @track isLoading = false; // État de chargement pour afficher le spinner
     @track errorMessage = ''; // Message d'erreur à afficher dans l'UI
     @track successMessage = ''; // Message de succès à afficher dans l'UI
+    @track hasGeneratedDoc = false; // true after Generate Document succeeds — enables Send for Signature
 
     /* ═══════════════ GETTERS ═══════════════ */ // Section des propriétés calculées
     get filteredProducts() { // Filtre local des produits selon la recherche utilisateur
@@ -1315,6 +1332,54 @@ export default class CpqConfigurator extends LightningElement { // Définition d
             });
     }
 
+    handleGenerateDocument() {
+        if (!this.quoteId)     { this._toast('Error', 'Create a quote first', 'error'); return; }
+        if (!this.hasCpqLines) { this._toast('Error', 'Add products to the quote first', 'error'); return; }
+        this.isLoading = true;
+        this.successMessage = this.currentLang === 'fr' ? 'Génération du document...' : 'Generating document...';
+        generateDocument({ quoteId: this.quoteId })
+            .then(() => {
+                this.isLoading = false;
+                this.successMessage = '';
+                this.hasGeneratedDoc = true;
+                // Apex auto-advanced Draft → Presented — sync the UI
+                if (this.quoteStatus === 'Draft') this.quoteStatus = 'Presented';
+                this._toast(
+                    this.currentLang === 'fr' ? 'Succès' : 'Success',
+                    this.currentLang === 'fr'
+                        ? 'Document généré et sauvegardé dans les Fichiers du devis. Cliquez "Envoyer pour signature" pour l\'envoyer au client.'
+                        : 'Document generated and saved in Quote Files. Click "Send for Signature" to send it to the client.',
+                    'success'
+                );
+            })
+            .catch(e => {
+                this.isLoading = false;
+                this._handleError(this.currentLang === 'fr' ? 'Génération échouée' : 'Document generation failed', e);
+            });
+    }
+
+    handleSendForSignature() {
+        if (!this.quoteId) { this._toast('Error', 'Create a quote first', 'error'); return; }
+        this.isLoading = true;
+        this.successMessage = this.currentLang === 'fr' ? 'Envoi via DocuSign...' : 'Sending via DocuSign...';
+        generateAndSendForSignature({ quoteId: this.quoteId })
+            .then(() => {
+                this.isLoading = false;
+                this.successMessage = '';
+                this._toast(
+                    this.currentLang === 'fr' ? 'Envoyé' : 'Sent',
+                    this.currentLang === 'fr'
+                        ? 'Le devis a été envoyé au client pour signature via DocuSign.'
+                        : 'Quote sent to client for signature via DocuSign.',
+                    'success'
+                );
+            })
+            .catch(e => {
+                this.isLoading = false;
+                this._handleError(this.currentLang === 'fr' ? 'Envoi DocuSign échoué' : 'DocuSign send failed', e);
+            });
+    }
+
     handleGeneratePDF() {
         if (!this.quoteId) {
             this._toast('Error', 'Create a quote first', 'error');
@@ -1412,7 +1477,17 @@ export default class CpqConfigurator extends LightningElement { // Définition d
     }
 
     _handleError(title, error) { // Gère et affiche les erreurs
-        const msg = (error && (error.body && error.body.message || error.message)) || String(error);
+        let msg;
+        if (typeof error === 'string') {
+            msg = error;
+        } else if (error) {
+            msg = (error.body && error.body.message)
+               || (error.body && error.body.output && error.body.output.errors && error.body.output.errors[0] && error.body.output.errors[0].message)
+               || error.message
+               || JSON.stringify(error);
+        } else {
+            msg = 'Unknown error';
+        }
         this.errorMessage = `${title}: ${msg}`;
         this.successMessage = ''; // Clear success message on error
         this.isLoading = false;

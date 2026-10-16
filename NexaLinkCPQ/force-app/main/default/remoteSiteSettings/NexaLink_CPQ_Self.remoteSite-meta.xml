@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Allows Apex to call CPQ REST API on this org for server-side document generation using the NexaLink quote template (SBQQ.QuoteDocumentSaver)</description>
+    <disableProtocolSecurity>false</disableProtocolSecurity>
+    <isActive>true</isActive>
+    <url>https://inetum-1c6-dev-ed.develop.my.salesforce.com</url>
+</RemoteSiteSetting>
